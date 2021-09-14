@@ -243,7 +243,7 @@ func configureSvcRouteViaInterface(iface string, gwIPs []net.IP) error {
 		if err != nil {
 			return fmt.Errorf("unable to find gateway IP for subnet: %v, found IPs: %v", subnet, gwIPs)
 		}
-		err = util.LinkRoutesAdd(link, gwIP[0], []*net.IPNet{subnet}, config.Default.MTU)
+		err = util.LinkRoutesAdd(link, gwIP[0], []*net.IPNet{subnet})
 		if err != nil && !os.IsExist(err) {
 			return fmt.Errorf("unable to add route for service via %s, error: %v", iface, err)
 		}
