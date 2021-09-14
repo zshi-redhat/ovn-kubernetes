@@ -84,7 +84,6 @@ configuration options when deploying. Use `./kind.sh -h` to see the latest optio
 usage: kind.sh [[[-cf |--config-file <file>] [-kt|keep-taint] [-ha|--ha-enabled]
                  [-ho |--hybrid-enabled] [-ii|--install-ingress] [-n4|--no-ipv4]
                  [-i6 |--ipv6] [-wk|--num-workers <num>] [-ds|--disable-snat-multiple-gws]
-                 [-dp |--disable-pkt-mtu-check]
                  [-nf |--netflow-targets <targets>] [sf|--sflow-targets <targets>] [-if|--ipfix-targets]
                  [-sw |--allow-system-writes] [-gm|--gateway-mode <mode>]
                  [-nl |--node-loglevel <num>] [-ml|--master-loglevel <num>]
@@ -102,7 +101,6 @@ usage: kind.sh [[[-cf |--config-file <file>] [-kt|keep-taint] [-ha|--ha-enabled]
 -ha  | --ha-enabled                Enable high availability. DEFAULT: HA Disabled.
 -ho  | --hybrid-enabled            Enable hybrid overlay. DEFAULT: Disabled.
 -ds  | --disable-snat-multiple-gws Disable SNAT for multiple gws. DEFAULT: Disabled.
--dp  | --disable-pkt-mtu-check     Disable checking packet size greater than MTU. Default: Disabled
 -nf  | --netflow-targets           Comma delimited list of ip:port netflow collectors. DEFAULT: Disabled.
 -sf  | --sflow-targets             Comma delimited list of ip:port sflow collectors. DEFAULT: Disabled.
 -if  | --ipfix-targets             Comma delimited list of ip:port ipfix collectors. DEFAULT: Disabled.

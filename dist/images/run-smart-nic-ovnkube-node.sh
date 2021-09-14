@@ -10,5 +10,4 @@ docker run --pid host --network host --user=0 --name ovn-node -dit --cap-add=NET
   -e OVN_KUBERNETES_NAMESPACE=ovn-kubernetes -e OVN_SSL_ENABLE=no -e OVNKUBE_NODE_MODE="smart-nic" \
   -e OVN_ENCAP_IP=$SMART_NIC_IP -e K8S_TOKEN=$K8S_TOKEN -e K8S_CACERT=$K8S_CACERT \
   -e OVN_GATEWAY_OPTS="$OVN_GATEWAY_OPTS" -e OVNKUBE_NODE_MGMT_PORT_NETDEV="$OVNKUBE_NODE_MGMT_PORT_NETDEV" \
-  -e OVN_DISABLE_PKT_MTU_CHECK=true \
    --entrypoint=/root/ovnkube.sh ovn-daemonset:latest "ovn-node"

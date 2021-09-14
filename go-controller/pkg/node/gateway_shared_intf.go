@@ -1227,7 +1227,7 @@ func addMasqueradeRoute(netIfaceName string, nextHops []net.IP) error {
 	if exists {
 		return nil
 	}
-	err = util.LinkRoutesAdd(netIfaceLink, v4nextHops[0], []*net.IPNet{masqIPNet})
+	err = util.LinkRoutesAdd(netIfaceLink, v4nextHops[0], []*net.IPNet{masqIPNet}, 0)
 	if os.IsExist(err) {
 		klog.V(5).Infof("Ignoring error %s from 'route add %s via %s'",
 			err.Error(), masqIPNet, v4nextHops[0])
