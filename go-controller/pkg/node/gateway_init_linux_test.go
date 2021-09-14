@@ -346,11 +346,6 @@ func shareGatewayInterfaceSmartNICTest(app *cli.App, testNS ns.NetNS,
 			Cmd:    "ovs-vsctl --timeout=15 --if-exists get Open_vSwitch . external_ids:system-id",
 			Output: systemID,
 		})
-		// DetectCheckPktLengthSupport
-		fexec.AddFakeCmd(&ovntest.ExpectedCmd{
-			Cmd:    "ovs-appctl --timeout=15 dpif/show-dp-features " + brphys,
-			Output: "Check pkt length action: Yes",
-		})
 		// GetSmartNICHostInterface
 		fexec.AddFakeCmd(&ovntest.ExpectedCmd{
 			Cmd:    "ovs-vsctl --timeout=15 list-ports " + brphys,
@@ -1131,7 +1126,6 @@ var _ = Describe("Gateway unit tests", func() {
 				LinkIndex: 5,
 				Scope:     netlink.SCOPE_UNIVERSE,
 				Gw:        gwIPs[0],
-				MTU:       config.Default.MTU,
 			}
 			lnk.On("Attrs").Return(lnkAttr)
 			netlinkMock.On("LinkByName", mock.Anything).Return(lnk, nil)

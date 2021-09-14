@@ -251,7 +251,7 @@ func addNodeLogicalFlows(fexec *ovntest.FakeExec, node *tNode, clusterCIDR strin
 		"ovn-nbctl --timeout=15 --if-exists lrp-del " + types.RouterToSwitchPrefix + node.Name + " -- lrp-add ovn_cluster_router " + types.RouterToSwitchPrefix + node.Name + " " + node.NodeLRPMAC + " " + node.NodeGWIP + " -- lrp-set-gateway-chassis " + types.RouterToSwitchPrefix + node.Name + " " + node.SystemID + " 1",
 		"ovn-nbctl --timeout=15 -- --may-exist lr-add " + node.GWRouter + " -- set logical_router " + node.GWRouter + " options:chassis=" + node.SystemID + " external_ids:physical_ip=" + node.GatewayRouterIP + " external_ids:physical_ips=" + node.GatewayRouterIP,
 		"ovn-nbctl --timeout=15 -- --may-exist lsp-add " + types.OVNJoinSwitch + " " + types.JoinSwitchToGWRouterPrefix + node.GWRouter + " -- set logical_switch_port " + types.JoinSwitchToGWRouterPrefix + node.GWRouter + " type=router options:router-port=" + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " addresses=router",
-		"ovn-nbctl --timeout=15 -- --if-exists lrp-del " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " -- lrp-add " + node.GWRouter + " " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " " + node.LrpMAC + " " + node.LrpIP + "/16" + addLRPForV6,
+		"ovn-nbctl --timeout=15 -- --if-exists lrp-del " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " -- lrp-add " + node.GWRouter + " " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " " + node.LrpMAC + " " + node.LrpIP + "/16" + addLRPForV6 + " -- set logical_router_port " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " options:gateway_mtu=1414",
 	})
 
 	fexec.AddFakeCmdsNoOutputNoError([]string{
@@ -289,7 +289,7 @@ func addNodeLogicalFlows(fexec *ovntest.FakeExec, node *tNode, clusterCIDR strin
 		fexec.AddFakeCmdsNoOutputNoError([]string{
 			"ovn-nbctl --timeout=15 -- --may-exist lr-add " + node.GWRouter + " -- set logical_router " + node.GWRouter + " options:chassis=" + node.SystemID + " external_ids:physical_ip=" + node.GatewayRouterIP + " external_ids:physical_ips=" + node.GatewayRouterIP,
 			"ovn-nbctl --timeout=15 -- --may-exist lsp-add " + types.OVNJoinSwitch + " " + types.JoinSwitchToGWRouterPrefix + node.GWRouter + " -- set logical_switch_port " + types.JoinSwitchToGWRouterPrefix + node.GWRouter + " type=router options:router-port=" + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " addresses=router",
-			"ovn-nbctl --timeout=15 -- --if-exists lrp-del " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " -- lrp-add " + node.GWRouter + " " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " " + node.LrpMAC + " " + node.LrpIP + "/16" + addLRPForV6,
+			"ovn-nbctl --timeout=15 -- --if-exists lrp-del " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " -- lrp-add " + node.GWRouter + " " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " " + node.LrpMAC + " " + node.LrpIP + "/16" + addLRPForV6 + " -- set logical_router_port " + types.GWRouterToJoinSwitchPrefix + node.GWRouter + " options:gateway_mtu=1414",
 		})
 
 		fexec.AddFakeCmdsNoOutputNoError([]string{

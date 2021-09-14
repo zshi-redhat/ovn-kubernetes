@@ -60,6 +60,9 @@ func gatewayInit(nodeName string, clusterIPSubnet []*net.IPNet, hostSubnets []*n
 	for _, gwLRPIfAddr := range gwLRPIfAddrs {
 		args = append(args, gwLRPIfAddr.String())
 	}
+	maxPktLength := config.Default.MTU + 14
+	args = append(args,
+		"--", "set", "logical_router_port", gwRouterPort, fmt.Sprintf("options:gateway_mtu=%d", maxPktLength))
 	_, stderr, err = util.RunOVNNbctl(args...)
 	if err != nil {
 		return fmt.Errorf("failed to add logical router port %q for gateway router %s, "+
