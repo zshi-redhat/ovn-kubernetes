@@ -500,7 +500,7 @@ func TestLinkRoutesAdd(t *testing.T) {
 			ovntest.ProcessMockFnList(&mockNetLinkOps.Mock, tc.onRetArgsNetLinkLibOpers)
 			ovntest.ProcessMockFnList(&mockLink.Mock, tc.onRetArgsLinkIfaceOpers)
 
-			err := LinkRoutesAdd(tc.inputLink, tc.inputGwIP, tc.inputSubnets, 0)
+			err := LinkRoutesAdd(tc.inputLink, tc.inputGwIP, tc.inputSubnets)
 			t.Log(err)
 			if tc.errExp {
 				assert.Error(t, err)

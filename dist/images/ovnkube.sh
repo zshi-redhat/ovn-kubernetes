@@ -188,7 +188,6 @@ ovn_sb_raft_election_timer=${OVN_SB_RAFT_ELECTION_TIMER:-1000}
 ovn_hybrid_overlay_enable=${OVN_HYBRID_OVERLAY_ENABLE:-}
 ovn_hybrid_overlay_net_cidr=${OVN_HYBRID_OVERLAY_NET_CIDR:-}
 ovn_disable_snat_multiple_gws=${OVN_DISABLE_SNAT_MULTIPLE_GWS:-}
-ovn_disable_pkt_mtu_check=${OVN_DISABLE_PKT_MTU_CHECK:-}
 ovn_empty_lb_events=${OVN_EMPTY_LB_EVENTS:-}
 # OVN_V4_JOIN_SUBNET - v4 join subnet
 ovn_v4_join_subnet=${OVN_V4_JOIN_SUBNET:-}
@@ -862,11 +861,6 @@ ovn-master() {
       disable_snat_multiple_gws_flag="--disable-snat-multiple-gws"
   fi
 
-  disable_pkt_mtu_check_flag=
-  if [[ ${ovn_disable_pkt_mtu_check} == "true" ]]; then
-      disable_pkt_mtu_check_flag="--disable-pkt-mtu-check"
-  fi
-
   empty_lb_events_flag=
   if [[ ${ovn_empty_lb_events} == "true" ]]; then
       empty_lb_events_flag="--ovn-empty-lb-events"
@@ -1027,11 +1021,6 @@ ovn-node() {
       disable_snat_multiple_gws_flag="--disable-snat-multiple-gws"
   fi
 
-  disable_pkt_mtu_check_flag=
-  if [[ ${ovn_disable_pkt_mtu_check} == "true" ]]; then
-      disable_pkt_mtu_check_flag="--disable-pkt-mtu-check"
-  fi
-
   multicast_enabled_flag=
   if [[ ${ovn_multicast_enable} == "true" ]]; then
       multicast_enabled_flag="--enable-multicast"
@@ -1130,7 +1119,6 @@ ovn-node() {
     --logfile-maxage=${ovnkube_logfile_maxage} \
     ${hybrid_overlay_flags} \
     ${disable_snat_multiple_gws_flag} \
-    ${disable_pkt_mtu_check_flag} \
     --gateway-mode=${ovn_gateway_mode} ${ovn_gateway_opts} \
     --gateway-router-subnet=${ovn_gateway_router_subnet} \
     --pidfile ${OVN_RUNDIR}/ovnkube.pid \
