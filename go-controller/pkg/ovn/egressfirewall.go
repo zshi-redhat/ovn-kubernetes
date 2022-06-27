@@ -297,9 +297,9 @@ func (oc *Controller) addEgressFirewallRules(ef *egressFirewall, hashedAddressSe
 		}
 		if rule.to.cidrSelector != "" {
 			if utilnet.IsIPv6CIDRString(rule.to.cidrSelector) {
-				matchTargets = []matchTarget{{matchKindV6CIDR, rule.to.cidrSelector}}
+				matchTargets = []matchTarget{{kind: matchKindV6CIDR, value: rule.to.cidrSelector}}
 			} else {
-				matchTargets = []matchTarget{{matchKindV4CIDR, rule.to.cidrSelector}}
+				matchTargets = []matchTarget{{kind: matchKindV4CIDR, value: rule.to.cidrSelector}}
 			}
 		} else {
 			// rule based on DNS NAME
@@ -309,10 +309,10 @@ func (oc *Controller) addEgressFirewallRules(ef *egressFirewall, hashedAddressSe
 			}
 			dnsNameIPv4ASHashName, dnsNameIPv6ASHashName := dnsNameAddressSets.GetASHashNames()
 			if dnsNameIPv4ASHashName != "" {
-				matchTargets = append(matchTargets, matchTarget{matchKindV4AddressSet, dnsNameIPv4ASHashName})
+				matchTargets = append(matchTargets, matchTarget{kind: matchKindV4AddressSet, value: dnsNameIPv4ASHashName})
 			}
 			if dnsNameIPv6ASHashName != "" {
-				matchTargets = append(matchTargets, matchTarget{matchKindV6AddressSet, dnsNameIPv6ASHashName})
+				matchTargets = append(matchTargets, matchTarget{kind: matchKindV6AddressSet, value: dnsNameIPv6ASHashName})
 			}
 		}
 		match := generateMatch(hashedAddressSetNameIPv4, hashedAddressSetNameIPv6, matchTargets, rule.ports)

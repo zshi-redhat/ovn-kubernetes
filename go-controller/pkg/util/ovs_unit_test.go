@@ -286,7 +286,7 @@ func TestRunOVNNorthAppCtl(t *testing.T) {
 					DirName:     "/var/run/ovn/",
 					Permissions: 0o755,
 					Files: []ovntest.AferoFileMockHelper{
-						{"/var/run/ovn/ovn-northd.pid", 0o755, []byte("pid")},
+						{FileName: "/var/run/ovn/ovn-northd.pid", Permissions: 0o755, Content: []byte("pid")},
 					},
 				},
 			},
@@ -359,7 +359,7 @@ func TestRunOVNControllerAppCtl(t *testing.T) {
 					DirName:     "/var/run/ovn/",
 					Permissions: 0o755,
 					Files: []ovntest.AferoFileMockHelper{
-						{"/var/run/ovn/ovn-controller.pid", 0o755, []byte("pid")},
+						{FileName: "/var/run/ovn/ovn-controller.pid", Permissions: 0o755, Content: []byte("pid")},
 					},
 				},
 			},
@@ -430,7 +430,7 @@ func TestRunOvsVswitchdAppCtl(t *testing.T) {
 					DirName:     "/var/run/openvswitch/",
 					Permissions: 0o755,
 					Files: []ovntest.AferoFileMockHelper{
-						{"/var/run/openvswitch/ovs-vswitchd.pid", 0o755, []byte("pid")},
+						{FileName: "/var/run/openvswitch/ovs-vswitchd.pid", Permissions: 0o755, Content: []byte("pid")},
 					},
 				},
 			},

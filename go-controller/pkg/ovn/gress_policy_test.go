@@ -1,9 +1,10 @@
 package ovn
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	knet "k8s.io/api/networking/v1"
-	"testing"
 )
 
 func TestGetMatchFromIPBlock(t *testing.T) {
@@ -127,32 +128,32 @@ func TestGetL4Match(t *testing.T) {
 		expected string
 	}{
 		{
-			"unsupported protocol",
-			"kube",
-			0,
-			0,
-			"",
+			desc:     "unsupported protocol",
+			protocol: "kube",
+			port:     0,
+			endPort:  0,
+			expected: "",
 		},
 		{
-			"valid protocol with no endport specified",
-			"TCP",
-			300,
-			0,
-			"tcp && tcp.dst==300",
+			desc:     "valid protocol with no endport specified",
+			protocol: "TCP",
+			port:     300,
+			endPort:  0,
+			expected: "tcp && tcp.dst==300",
 		},
 		{
-			"valid protocol with endport specified",
-			"TCP",
-			300,
-			310,
-			"tcp && 300<=tcp.dst<=310",
+			desc:     "valid protocol with endport specified",
+			protocol: "TCP",
+			port:     300,
+			endPort:  310,
+			expected: "tcp && 300<=tcp.dst<=310",
 		},
 		{
-			"valid protocol with no ports specified",
-			"TCP",
-			0,
-			0,
-			"tcp",
+			desc:     "valid protocol with no ports specified",
+			protocol: "TCP",
+			port:     0,
+			endPort:  0,
+			expected: "tcp",
 		},
 	}
 
