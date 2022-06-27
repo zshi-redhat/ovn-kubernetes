@@ -34,19 +34,12 @@ import (
 //
 // TODO: use RLE and compact the allocator to minimize space.
 type AllocationBitmap struct {
-	// strategy carries the details of how to choose the next available item out of the range
-	strategy bitAllocator
-	// max is the maximum size of the usable items in the range
-	max int
-	// rangeSpec is the range specifier, matching RangeAllocation.Range
-	rangeSpec string
-
-	// lock guards the following members
-	lock sync.Mutex
-	// count is the number of currently allocated elements in the range
-	count int
-	// allocated is a bit array of the allocated items in the range
+	strategy  bitAllocator
 	allocated *big.Int
+	rangeSpec string
+	max       int
+	count     int
+	lock      sync.Mutex
 }
 
 // AllocationBitmap implements Interface and Snapshottable

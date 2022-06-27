@@ -84,11 +84,11 @@ func TestL3GatewayConfig_MarshalJSON(t *testing.T) {
 
 func TestL3GatewayConfig_UnmarshalJSON(t *testing.T) {
 	tests := []struct {
-		desc       string
-		expOut     L3GatewayConfig
-		inputParam []byte
-		errAssert  bool
 		errMatch   error
+		desc       string
+		inputParam []byte
+		expOut     L3GatewayConfig
+		errAssert  bool
 	}{
 		{
 			desc:       "error: test bad input causing json Unmarshal error",
@@ -191,11 +191,11 @@ func TestSetL3GatewayConfig(t *testing.T) {
 	mockAnnotator := new(annotatorMock.Annotator)
 
 	tests := []struct {
-		desc                   string
 		inpNodeAnnotator       kube.Annotator
+		desc                   string
+		onRetArgsAnnotatorList []ovntest.TestifyMockHelper
 		inputL3GwCfg           L3GatewayConfig
 		errExpected            bool
-		onRetArgsAnnotatorList []ovntest.TestifyMockHelper
 	}{
 		{
 			desc:             "success: empty L3GatewayConfig applied should pass",
@@ -261,10 +261,10 @@ func TestSetL3GatewayConfig(t *testing.T) {
 
 func TestParseNodeL3GatewayAnnotation(t *testing.T) {
 	tests := []struct {
-		desc      string
-		inpNode   *v1.Node
-		errAssert bool
 		errMatch  error
+		inpNode   *v1.Node
+		desc      string
+		errAssert bool
 	}{
 		{
 			desc:      "error: annotation not found for node",
@@ -331,9 +331,9 @@ func TestParseNodeL3GatewayAnnotation(t *testing.T) {
 
 func TestNodeL3GatewayAnnotationChanged(t *testing.T) {
 	tests := []struct {
-		desc    string
 		oldNode *v1.Node
 		newNode *v1.Node
+		desc    string
 		result  bool
 	}{
 		{
@@ -399,8 +399,8 @@ func TestNodeL3GatewayAnnotationChanged(t *testing.T) {
 
 func TestParseNodeManagementPortMACAddress(t *testing.T) {
 	tests := []struct {
-		desc        string
 		inpNode     v1.Node
+		desc        string
 		errExpected bool
 		expOutput   bool
 	}{
@@ -446,8 +446,8 @@ func TestParseNodeManagementPortMACAddress(t *testing.T) {
 
 func TestParseNodeGatewayRouterLRPAddr(t *testing.T) {
 	tests := []struct {
-		desc        string
 		inpNode     v1.Node
+		desc        string
 		errExpected bool
 		expOutput   bool
 	}{

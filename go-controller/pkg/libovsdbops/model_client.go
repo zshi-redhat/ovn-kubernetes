@@ -125,31 +125,14 @@ func buildMutationsFromFields(fields []interface{}, mutator ovsdb.Mutator) ([]mo
  idempotent operations against OVS DB (NB DB by default).
 */
 type operationModel struct {
-	// Model specifies the model to be created, or to look up in the cache
-	// if ModelPredicate is not specified. The values in the fields of the
-	// Model are used for mutations and updates as well. If this Model is
-	// looked up or created, it will have its UUID set after the operation.
-	Model interface{}
-	// ModelPredicate specifies a predicate to look up models in the cache.
-	ModelPredicate interface{}
-	// ExistingResult is where the results of the look up are added to.
-	// Required when Model is not specified.
-	ExistingResult interface{}
-	// OnModelMutations specifies the fields from Model that will be used as
-	// the mutation value.
+	Model            interface{}
+	ModelPredicate   interface{}
+	ExistingResult   interface{}
+	DoAfter          func()
 	OnModelMutations []interface{}
-	// OnModelUpdates specifies the fields from Model that will be used as
-	// the update value.
-	OnModelUpdates []interface{}
-	// ErrNotFound flags this operation to fail with ErrNotFound if a model is
-	// not found.
-	ErrNotFound bool
-	// BulkOp flags this operation as a bulk operation capable of updating or
-	// mutating more than 1 model.
-	BulkOp bool
-	// DoAfter is invoked at the end of the operation and allows to setup a
-	// subsequent operation with values obtained from this one.
-	DoAfter func()
+	OnModelUpdates   []interface{}
+	ErrNotFound      bool
+	BulkOp           bool
 }
 
 func onModelUpdatesNone() []interface{} {

@@ -46,13 +46,10 @@ type ovnRoute struct {
 }
 
 type externalRouteInfo struct {
+	podExternalRoutes map[string]map[string]string
+	podName           ktypes.NamespacedName
 	sync.Mutex
 	deleted bool
-	podName ktypes.NamespacedName
-	// podExternalRoutes is a cache keeping the LR routes added to the GRs when
-	// external gateways are used. The first map key is the podIP (src-ip of the route),
-	// the second the GW IP (next hop), and the third the GR name
-	podExternalRoutes map[string]map[string]string
 }
 
 // ensureRouteInfoLocked either gets the current routeInfo in the cache with a lock, or creates+locks a new one if missing

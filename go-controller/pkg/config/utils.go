@@ -140,15 +140,15 @@ const (
 )
 
 type configSubnet struct {
-	subnetType configSubnetType
 	subnet     *net.IPNet
+	subnetType configSubnetType
 }
 
 // configSubnets represents a set of configured subnets (and their names)
 type configSubnets struct {
-	subnets []configSubnet
 	v4      map[configSubnetType]bool
 	v6      map[configSubnetType]bool
+	subnets []configSubnet
 }
 
 // newConfigSubnets returns a new configSubnets

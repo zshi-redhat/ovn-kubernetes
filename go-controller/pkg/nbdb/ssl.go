@@ -7,14 +7,14 @@ import "github.com/ovn-org/libovsdb/model"
 
 // SSL defines an object in SSL table
 type SSL struct {
+	ExternalIDs     map[string]string `ovsdb:"external_ids"`
 	UUID            string            `ovsdb:"_uuid"`
-	BootstrapCaCert bool              `ovsdb:"bootstrap_ca_cert"`
+	SSLProtocols    string            `ovsdb:"ssl_protocols"`
 	CaCert          string            `ovsdb:"ca_cert"`
 	Certificate     string            `ovsdb:"certificate"`
-	ExternalIDs     map[string]string `ovsdb:"external_ids"`
 	PrivateKey      string            `ovsdb:"private_key"`
 	SSLCiphers      string            `ovsdb:"ssl_ciphers"`
-	SSLProtocols    string            `ovsdb:"ssl_protocols"`
+	BootstrapCaCert bool              `ovsdb:"bootstrap_ca_cert"`
 }
 
 func copySSLExternalIDs(a map[string]string) map[string]string {

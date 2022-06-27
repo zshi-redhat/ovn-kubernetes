@@ -1776,12 +1776,12 @@ func (oc *Controller) initClusterEgressPolicies(nodes []interface{}) error {
 // egressNode is a cache helper used for egress IP assignment, representing an egress node
 type egressNode struct {
 	egressIPConfig     *util.ParsedNodeEgressIPConfiguration
-	mgmtIPs            []net.IP
 	allocations        map[string]string
+	name               string
+	mgmtIPs            []net.IP
 	isReady            bool
 	isReachable        bool
 	isEgressAssignable bool
-	name               string
 }
 
 func (e *egressNode) getAllocationCountForEgressIP(name string) (count int) {

@@ -169,63 +169,22 @@ const (
 
 // DefaultConfig holds parsed config file parameters and command-line overrides
 type DefaultConfig struct {
-	// MTU value used for the overlay networks.
-	MTU int `gcfg:"mtu"`
-	// RoutableMTU is the maximum routable MTU between nodes, used to facilitate
-	// an MTU migration procedure where different nodes might be using different
-	// MTU values
-	RoutableMTU int `gcfg:"routable-mtu"`
-	// ConntrackZone affects only the gateway nodes, This value is used to track connections
-	// that are initiated from the pods so that the reverse connections go back to the pods.
-	// This represents the conntrack zone used for the conntrack flow rules.
-	ConntrackZone int `gcfg:"conntrack-zone"`
-	// EncapType value defines the encapsulation protocol to use to transmit packets between
-	// hypervisors. By default the value is 'geneve'
-	EncapType string `gcfg:"encap-type"`
-	// The IP address of the encapsulation endpoint. If not specified, the IP address the
-	// NodeName resolves to will be used
-	EncapIP string `gcfg:"encap-ip"`
-	// The UDP Port of the encapsulation endpoint. If not specified, the IP default port
-	// of 6081 will be used
-	EncapPort uint `gcfg:"encap-port"`
-	// Maximum number of milliseconds of idle time on connection that
-	// ovn-controller waits before it will send a connection health probe.
-	InactivityProbe int `gcfg:"inactivity-probe"`
-	// Maximum number of seconds of idle time on the OpenFlow connection
-	// that ovn-controller will wait before it sends a connection health probe
-	OpenFlowProbe int `gcfg:"openflow-probe"`
-	// Maximum number of milliseconds that ovn-controller waits before clearing existing flows
-	// during start up, to make sure the initial flow compute is complete and avoid data plane
-	// interruptions.
-	OfctrlWaitBeforeClear int `gcfg:"ofctrl-wait-before-clear"`
-	// The  boolean  flag  indicates  if  ovn-controller  should monitor all data in SB DB
-	// instead of conditionally monitoring the data relevant to this node only.
-	// By default monitor-all is enabled.
-	MonitorAll bool `gcfg:"monitor-all"`
-	// The  boolean  flag  indicates  if  ovn-controller  should
-	// enable/disable the logical flow in-memory cache  it  uses
-	// when processing Southbound database logical flow changes.
-	// By default caching is enabled.
-	LFlowCacheEnable bool `gcfg:"enable-lflow-cache"`
-	// Maximum  number  of logical flow cache entries ovn-controller
-	// may create when the logical flow  cache  is  enabled.  By
-	// default the size of the cache is unlimited.
-	LFlowCacheLimit uint `gcfg:"lflow-cache-limit"`
-	// Maximum  number  of logical flow cache entries ovn-controller
-	// may create when the logical flow  cache  is  enabled.  By
-	// default the size of the cache is unlimited.
-	LFlowCacheLimitKb uint `gcfg:"lflow-cache-limit-kb"`
-	// RawClusterSubnets holds the unparsed cluster subnets. Should only be
-	// used inside config module.
-	RawClusterSubnets string `gcfg:"cluster-subnets"`
-	// ClusterSubnets holds parsed cluster subnet entries and may be used
-	// outside the config module.
-	ClusterSubnets []CIDRNetworkEntry
-	// EnableUDPAggregation is true if ovn-kubernetes should use UDP Generic Receive
-	// Offload forwarding to improve the performance of containers that transmit lots
-	// of small UDP packets by allowing them to be aggregated before passing through
-	// the kernel network stack. This requires a new-enough kernel (5.15 or RHEL 8.5).
-	EnableUDPAggregation bool `gcfg:"enable-udp-aggregation"`
+	EncapIP               string `gcfg:"encap-ip"`
+	RawClusterSubnets     string `gcfg:"cluster-subnets"`
+	EncapType             string `gcfg:"encap-type"`
+	ClusterSubnets        []CIDRNetworkEntry
+	MTU                   int  `gcfg:"mtu"`
+	EncapPort             uint `gcfg:"encap-port"`
+	InactivityProbe       int  `gcfg:"inactivity-probe"`
+	OpenFlowProbe         int  `gcfg:"openflow-probe"`
+	OfctrlWaitBeforeClear int  `gcfg:"ofctrl-wait-before-clear"`
+	ConntrackZone         int  `gcfg:"conntrack-zone"`
+	RoutableMTU           int  `gcfg:"routable-mtu"`
+	LFlowCacheLimit       uint `gcfg:"lflow-cache-limit"`
+	LFlowCacheLimitKb     uint `gcfg:"lflow-cache-limit-kb"`
+	LFlowCacheEnable      bool `gcfg:"enable-lflow-cache"`
+	MonitorAll            bool `gcfg:"monitor-all"`
+	EnableUDPAggregation  bool `gcfg:"enable-udp-aggregation"`
 }
 
 // LoggingConfig holds logging-related parsed config file parameters and command-line overrides
@@ -290,50 +249,42 @@ type CNIConfig struct {
 
 // KubernetesConfig holds Kubernetes-related parsed config file parameters and command-line overrides
 type KubernetesConfig struct {
-	Kubeconfig           string `gcfg:"kubeconfig"`
-	CACert               string `gcfg:"cacert"`
-	CAData               []byte
-	APIServer            string `gcfg:"apiserver"`
-	Token                string `gcfg:"token"`
-	TokenFile            string `gcfg:"tokenFile"`
-	CompatServiceCIDR    string `gcfg:"service-cidr"`
-	RawServiceCIDRs      string `gcfg:"service-cidrs"`
-	ServiceCIDRs         []*net.IPNet
-	OVNConfigNamespace   string `gcfg:"ovn-config-namespace"`
-	OVNEmptyLbEvents     bool   `gcfg:"ovn-empty-lb-events"`
-	PodIP                string `gcfg:"pod-ip"` // UNUSED
-	RawNoHostSubnetNodes string `gcfg:"no-hostsubnet-nodes"`
-	NoHostSubnetNodes    *metav1.LabelSelector
-	HostNetworkNamespace string `gcfg:"host-network-namespace"`
-	PlatformType         string `gcfg:"platform-type"`
-
-	// CompatMetricsBindAddress is overridden by the corresponding option in MetricsConfig
-	CompatMetricsBindAddress string `gcfg:"metrics-bind-address"`
-	// CompatOVNMetricsBindAddress is overridden by the corresponding option in MetricsConfig
+	NoHostSubnetNodes           *metav1.LabelSelector
+	Kubeconfig                  string `gcfg:"kubeconfig"`
 	CompatOVNMetricsBindAddress string `gcfg:"ovn-metrics-bind-address"`
-	// CompatMetricsEnablePprof is overridden by the corresponding option in MetricsConfig
-	CompatMetricsEnablePprof bool `gcfg:"metrics-enable-pprof"`
+	APIServer                   string `gcfg:"apiserver"`
+	Token                       string `gcfg:"token"`
+	TokenFile                   string `gcfg:"tokenFile"`
+	CompatServiceCIDR           string `gcfg:"service-cidr"`
+	RawServiceCIDRs             string `gcfg:"service-cidrs"`
+	CompatMetricsBindAddress    string `gcfg:"metrics-bind-address"`
+	OVNConfigNamespace          string `gcfg:"ovn-config-namespace"`
+	PlatformType                string `gcfg:"platform-type"`
+	PodIP                       string `gcfg:"pod-ip"`
+	RawNoHostSubnetNodes        string `gcfg:"no-hostsubnet-nodes"`
+	CACert                      string `gcfg:"cacert"`
+	HostNetworkNamespace        string `gcfg:"host-network-namespace"`
+	ServiceCIDRs                []*net.IPNet
+	CAData                      []byte
+	OVNEmptyLbEvents            bool `gcfg:"ovn-empty-lb-events"`
+	CompatMetricsEnablePprof    bool `gcfg:"metrics-enable-pprof"`
 }
 
 // MetricsConfig holds Prometheus metrics-related parameters.
 type MetricsConfig struct {
 	BindAddress           string `gcfg:"bind-address"`
 	OVNMetricsBindAddress string `gcfg:"ovn-metrics-bind-address"`
-	ExportOVSMetrics      bool   `gcfg:"export-ovs-metrics"`
-	EnablePprof           bool   `gcfg:"enable-pprof"`
 	NodeServerPrivKey     string `gcfg:"node-server-privkey"`
 	NodeServerCert        string `gcfg:"node-server-cert"`
-	// EnableConfigDuration holds the boolean flag to enable OVN-Kubernetes master to monitor OVN-Kubernetes master
-	// configuration duration and optionally, its application to all nodes
-	EnableConfigDuration bool `gcfg:"enable-config-duration"`
+	ExportOVSMetrics      bool   `gcfg:"export-ovs-metrics"`
+	EnablePprof           bool   `gcfg:"enable-pprof"`
+	EnableConfigDuration  bool   `gcfg:"enable-config-duration"`
 }
 
 // OVNKubernetesFeatureConfig holds OVN-Kubernetes feature enhancement config file parameters and command-line overrides
 type OVNKubernetesFeatureConfig struct {
-	// EgressIP feature is enabled
-	EnableEgressIP bool `gcfg:"enable-egress-ip"`
-	// EgressIP node reachability total timeout in seconds
 	EgressIPReachabiltyTotalTimeout int  `gcfg:"egressip-reachability-total-timeout"`
+	EnableEgressIP                  bool `gcfg:"enable-egress-ip"`
 	EnableEgressFirewall            bool `gcfg:"enable-egress-firewall"`
 	EnableEgressQoS                 bool `gcfg:"enable-egress-qos"`
 }
@@ -352,48 +303,31 @@ const (
 
 // GatewayConfig holds node gateway-related parsed config file parameters and command-line overrides
 type GatewayConfig struct {
-	// Mode is the gateway mode; if may be either empty (disabled), "shared", or "local"
-	Mode GatewayMode `gcfg:"mode"`
-	// Interface is the network interface to use for the gateway in "shared" mode
-	Interface string `gcfg:"interface"`
-	// Exgress gateway interface is the optional network interface to use for external gw pods traffic.
-	EgressGWInterface string `gcfg:"egw-interface"`
-	// NextHop is the gateway IP address of Interface; will be autodetected if not given
-	NextHop string `gcfg:"next-hop"`
-	// VLANID is the option VLAN tag to apply to gateway traffic for "shared" mode
-	VLANID uint `gcfg:"vlan-id"`
-	// NodeportEnable sets whether to provide Kubernetes NodePort service or not
-	NodeportEnable bool `gcfg:"nodeport"`
-	// DisableSNATMultipleGws sets whether to disable SNAT of egress traffic in namespaces annotated with routing-external-gws
-	DisableSNATMultipleGWs bool `gcfg:"disable-snat-multiple-gws"`
-	// V4JoinSubnet to be used in the cluster
-	V4JoinSubnet string `gcfg:"v4-join-subnet"`
-	// V6JoinSubnet to be used in the cluster
-	V6JoinSubnet string `gcfg:"v6-join-subnet"`
-	// DisablePacketMTUCheck disables adding openflow flows to check packets too large to be
-	// delivered to OVN due to pod MTU being lower than NIC MTU. Disabling this check will result in southbound packets
-	// exceeding pod MTU to be dropped by OVN. With this check enabled, ICMP needs frag/packet too big will be sent
-	// back to the original client
-	DisablePacketMTUCheck bool `gcfg:"disable-pkt-mtu-check"`
-	// RouterSubnet is the subnet to be used for the GR external port. auto-detected if not given.
-	// Must match the the kube node IP address. Currently valid for DPU only.
-	RouterSubnet string `gcfg:"router-subnet"`
+	Mode                   GatewayMode `gcfg:"mode"`
+	Interface              string      `gcfg:"interface"`
+	EgressGWInterface      string      `gcfg:"egw-interface"`
+	NextHop                string      `gcfg:"next-hop"`
+	RouterSubnet           string      `gcfg:"router-subnet"`
+	V4JoinSubnet           string      `gcfg:"v4-join-subnet"`
+	V6JoinSubnet           string      `gcfg:"v6-join-subnet"`
+	VLANID                 uint        `gcfg:"vlan-id"`
+	NodeportEnable         bool        `gcfg:"nodeport"`
+	DisableSNATMultipleGWs bool        `gcfg:"disable-snat-multiple-gws"`
+	DisablePacketMTUCheck  bool        `gcfg:"disable-pkt-mtu-check"`
 }
 
 // OvnAuthConfig holds client authentication and location details for
 // an OVN database (either northbound or southbound)
 type OvnAuthConfig struct {
-	// e.g: "ssl:192.168.1.2:6641,ssl:192.168.1.2:6642"
+	exec           kexec.Interface
 	Address        string `gcfg:"address"`
 	PrivKey        string `gcfg:"client-privkey"`
-	Cert           string `gcfg:"client-cert"`
 	CACert         string `gcfg:"client-cacert"`
 	CertCommonName string `gcfg:"cert-common-name"`
 	Scheme         OvnDBScheme
-	ElectionTimer  uint `gcfg:"election-timer"`
+	Cert           string `gcfg:"client-cert"`
+	ElectionTimer  uint   `gcfg:"election-timer"`
 	northbound     bool
-
-	exec kexec.Interface
 }
 
 // MasterHAConfig holds configuration for master HA
@@ -407,16 +341,10 @@ type MasterHAConfig struct {
 // HybridOverlayConfig holds configuration for hybrid overlay
 // configuration.
 type HybridOverlayConfig struct {
-	// Enabled indicates whether hybrid overlay features are enabled or not.
-	Enabled bool `gcfg:"enabled"`
-	// RawClusterSubnets holds the unparsed hybrid overlay cluster subnets.
-	// Should only be used inside config module.
 	RawClusterSubnets string `gcfg:"cluster-subnets"`
-	// ClusterSubnets holds parsed hybrid overlay cluster subnet entries and
-	// may be used outside the config module.
-	ClusterSubnets []CIDRNetworkEntry
-	// VXLANPort holds the VXLAN tunnel UDP port number.
-	VXLANPort uint `gcfg:"hybrid-overlay-vxlan-port"`
+	ClusterSubnets    []CIDRNetworkEntry
+	VXLANPort         uint `gcfg:"hybrid-overlay-vxlan-port"`
+	Enabled           bool `gcfg:"enabled"`
 }
 
 // OvnKubeNodeConfig holds ovnkube-node configurations
@@ -440,20 +368,20 @@ const (
 
 // Config is used to read the structured config file and to cache config in testcases
 type config struct {
-	Default              DefaultConfig
-	Logging              LoggingConfig
-	Monitoring           MonitoringConfig
-	IPFIX                IPFIXConfig
 	CNI                  CNIConfig
-	OVNKubernetesFeature OVNKubernetesFeatureConfig
-	Kubernetes           KubernetesConfig
+	Monitoring           MonitoringConfig
 	Metrics              MetricsConfig
-	OvnNorth             OvnAuthConfig
-	OvnSouth             OvnAuthConfig
-	Gateway              GatewayConfig
-	MasterHA             MasterHAConfig
-	HybridOverlay        HybridOverlayConfig
 	OvnKubeNode          OvnKubeNodeConfig
+	Kubernetes           KubernetesConfig
+	OvnNorth             OvnAuthConfig
+	Gateway              GatewayConfig
+	OvnSouth             OvnAuthConfig
+	HybridOverlay        HybridOverlayConfig
+	Logging              LoggingConfig
+	Default              DefaultConfig
+	IPFIX                IPFIXConfig
+	MasterHA             MasterHAConfig
+	OVNKubernetesFeature OVNKubernetesFeatureConfig
 }
 
 var (

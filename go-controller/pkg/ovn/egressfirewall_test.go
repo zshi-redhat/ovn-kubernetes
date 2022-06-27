@@ -1822,8 +1822,8 @@ var _ = ginkgo.Describe("OVN test basic functions", func() {
 
 	ginkgo.It("computes correct L4Match", func() {
 		type testcase struct {
-			ports         []egressfirewallapi.EgressFirewallPort
 			expectedMatch string
+			ports         []egressfirewallapi.EgressFirewallPort
 		}
 		testcases := []testcase{
 			{
@@ -1879,11 +1879,11 @@ var _ = ginkgo.Describe("OVN test basic functions", func() {
 			internalCIDR string
 			ipv4source   string
 			ipv6source   string
-			ipv4Mode     bool
-			ipv6Mode     bool
+			output       string
 			destinations []matchTarget
 			ports        []egressfirewallapi.EgressFirewallPort
-			output       string
+			ipv4Mode     bool
+			ipv6Mode     bool
 		}
 		testcases := []testcase{
 			{
@@ -1960,11 +1960,11 @@ var _ = ginkgo.Describe("OVN test basic functions", func() {
 	})
 	ginkgo.It("correctly parses egressFirewallRules", func() {
 		type testcase struct {
+			errOutput          string
 			egressFirewallRule egressfirewallapi.EgressFirewallRule
+			output             egressFirewallRule
 			id                 int
 			err                bool
-			errOutput          string
-			output             egressFirewallRule
 		}
 		testcases := []testcase{
 			{

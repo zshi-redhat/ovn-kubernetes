@@ -7,10 +7,10 @@ import "github.com/ovn-org/libovsdb/model"
 
 // HAChassisGroup defines an object in HA_Chassis_Group table
 type HAChassisGroup struct {
-	UUID        string            `ovsdb:"_uuid"`
 	ExternalIDs map[string]string `ovsdb:"external_ids"`
-	HaChassis   []string          `ovsdb:"ha_chassis"`
+	UUID        string            `ovsdb:"_uuid"`
 	Name        string            `ovsdb:"name"`
+	HaChassis   []string          `ovsdb:"ha_chassis"`
 }
 
 func copyHAChassisGroupExternalIDs(a map[string]string) map[string]string {

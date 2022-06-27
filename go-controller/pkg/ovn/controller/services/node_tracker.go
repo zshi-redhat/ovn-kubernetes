@@ -19,27 +19,17 @@ import (
 // to service creation. If a new node is created, it requests a resync of all services,
 // since need to apply those service's load balancers to the new node as well.
 type nodeTracker struct {
-	sync.Mutex
-
-	// nodes is the list of nodes we know about
-	// map of name -> info
-	nodes map[string]nodeInfo
-
-	// resyncFn is the function to call so that all service are resynced
+	nodes    map[string]nodeInfo
 	resyncFn func()
+	sync.Mutex
 }
 
 type nodeInfo struct {
-	// the node's Name
-	name string
-	// The list of physical IPs the node has, as reported by the gatewayconf annotation
-	nodeIPs []string
-	// The pod network subnet(s)
-	podSubnets []net.IPNet
-	// the name of the node's GatewayRouter, or "" of non-existent
+	name              string
 	gatewayRouterName string
-	// The name of the node's switch - never empty
-	switchName string
+	switchName        string
+	nodeIPs           []string
+	podSubnets        []net.IPNet
 }
 
 // returns a list of all ip blocks "assigned" to this node

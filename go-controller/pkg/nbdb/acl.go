@@ -28,18 +28,18 @@ var (
 
 // ACL defines an object in ACL table
 type ACL struct {
-	UUID        string            `ovsdb:"_uuid"`
-	Action      ACLAction         `ovsdb:"action"`
-	Direction   ACLDirection      `ovsdb:"direction"`
-	ExternalIDs map[string]string `ovsdb:"external_ids"`
-	Label       int               `ovsdb:"label"`
-	Log         bool              `ovsdb:"log"`
-	Match       string            `ovsdb:"match"`
 	Meter       *string           `ovsdb:"meter"`
 	Name        *string           `ovsdb:"name"`
-	Options     map[string]string `ovsdb:"options"`
-	Priority    int               `ovsdb:"priority"`
+	ExternalIDs map[string]string `ovsdb:"external_ids"`
 	Severity    *ACLSeverity      `ovsdb:"severity"`
+	Options     map[string]string `ovsdb:"options"`
+	UUID        string            `ovsdb:"_uuid"`
+	Match       string            `ovsdb:"match"`
+	Action      ACLAction         `ovsdb:"action"`
+	Direction   ACLDirection      `ovsdb:"direction"`
+	Label       int               `ovsdb:"label"`
+	Priority    int               `ovsdb:"priority"`
+	Log         bool              `ovsdb:"log"`
 }
 
 func copyACLExternalIDs(a map[string]string) map[string]string {

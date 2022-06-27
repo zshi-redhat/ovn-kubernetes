@@ -19,21 +19,19 @@ import (
 // subnet allocations (v4 and v6) as well as the IPAM allocator instances for each
 // subnet managed for this node
 type logicalSwitchInfo struct {
+	uuid         string
 	hostSubnets  []*net.IPNet
 	ipams        []ipam.Interface
 	noHostSubnet bool
-	// the uuid of the logicalSwitch described by this struct
-	uuid string
 }
 
 type ipamFactoryFunc func(*net.IPNet) (ipam.Interface, error)
 
 // LogicalSwitchManager provides switch info management APIs including IPAM for the host subnets
 type LogicalSwitchManager struct {
-	cache map[string]logicalSwitchInfo
-	// A RW mutex for LogicalSwitchManager which holds logicalSwitch information
-	sync.RWMutex
+	cache    map[string]logicalSwitchInfo
 	ipamFunc ipamFactoryFunc
+	sync.RWMutex
 }
 
 // GetUUID returns the UUID for the given logical switch name if

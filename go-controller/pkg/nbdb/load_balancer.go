@@ -24,15 +24,15 @@ var (
 
 // LoadBalancer defines an object in Load_Balancer table
 type LoadBalancer struct {
-	UUID            string                        `ovsdb:"_uuid"`
-	ExternalIDs     map[string]string             `ovsdb:"external_ids"`
-	HealthCheck     []string                      `ovsdb:"health_check"`
-	IPPortMappings  map[string]string             `ovsdb:"ip_port_mappings"`
-	Name            string                        `ovsdb:"name"`
-	Options         map[string]string             `ovsdb:"options"`
 	Protocol        *LoadBalancerProtocol         `ovsdb:"protocol"`
-	SelectionFields []LoadBalancerSelectionFields `ovsdb:"selection_fields"`
+	ExternalIDs     map[string]string             `ovsdb:"external_ids"`
 	Vips            map[string]string             `ovsdb:"vips"`
+	IPPortMappings  map[string]string             `ovsdb:"ip_port_mappings"`
+	Options         map[string]string             `ovsdb:"options"`
+	Name            string                        `ovsdb:"name"`
+	UUID            string                        `ovsdb:"_uuid"`
+	SelectionFields []LoadBalancerSelectionFields `ovsdb:"selection_fields"`
+	HealthCheck     []string                      `ovsdb:"health_check"`
 }
 
 func copyLoadBalancerExternalIDs(a map[string]string) map[string]string {

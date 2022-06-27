@@ -123,9 +123,9 @@ func TestGetL4Match(t *testing.T) {
 	testcases := []struct {
 		desc     string
 		protocol string
+		expected string
 		port     int32
 		endPort  int32
-		expected string
 	}{
 		{
 			desc:     "unsupported protocol",

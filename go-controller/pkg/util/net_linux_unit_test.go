@@ -49,8 +49,8 @@ func TestLinkSetUp(t *testing.T) {
 	tests := []struct {
 		desc                     string
 		input                    string
-		errExp                   bool
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:   "fails to look up link",
@@ -101,11 +101,11 @@ func TestLinkAddrFlush(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
 		input                    netlink.Link
-		errExp                   bool
+		desc                     string
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:   "fail to list addresses for link",
@@ -203,12 +203,12 @@ func TestLinkAddrExist(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
 		inputAddrToMatch         *net.IPNet
-		errExp                   bool
+		desc                     string
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:             "AddrList call returns error for given link",
@@ -276,12 +276,12 @@ func TestLinkAddrAdd(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
 		inputNewAddr             *net.IPNet
-		errExp                   bool
+		desc                     string
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:         "setting <nil> address on link errors out",
@@ -341,12 +341,12 @@ func TestLinkRoutesDel(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
+		desc                     string
 		inputSubnets             []*net.IPNet
-		errExp                   bool
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:      "fails to get routes for link",
@@ -479,13 +479,13 @@ func TestLinkRoutesAdd(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
+		desc                     string
 		inputGwIP                net.IP
 		inputSubnets             []*net.IPNet
-		errExp                   bool
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:         "Route add fails",
@@ -542,14 +542,14 @@ func TestLinkRoutesAddOrUpdateMTU(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
+		desc                     string
 		inputGwIP                net.IP
 		inputSubnets             []*net.IPNet
-		inputMTU                 int
-		errExp                   bool
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		inputMTU                 int
+		errExp                   bool
 	}{
 		{
 			desc:         "Route get fails",
@@ -645,14 +645,14 @@ func TestLinkRouteExists(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
-		inputGwIP                net.IP
 		inputSubnet              *net.IPNet
-		errExp                   bool
-		outBoolFlag              bool
+		desc                     string
+		inputGwIP                net.IP
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
+		outBoolFlag              bool
 	}{
 		{
 			desc:        "tests code path when RouteListFiltered() returns error",
@@ -750,13 +750,13 @@ func TestLinkNeighAdd(t *testing.T) {
 	// below is defined in net_linux.go
 	netLinkOps = mockNetLinkOps
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
+		desc                     string
 		inputNeigIP              net.IP
 		inputMacAddr             net.HardwareAddr
-		errExp                   bool
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		// NOTE: since, we dont validate function arguments in the function body, a nil value passed for neighIP and neighMac is sufficient
 		{
@@ -806,14 +806,14 @@ func TestLinkNeighExists(t *testing.T) {
 	// below is defined in net_linux.go
 	netLinkOps = mockNetLinkOps
 	tests := []struct {
-		desc                     string
 		inputLink                netlink.Link
+		desc                     string
 		inputNeigIP              net.IP
 		inputMacAddr             net.HardwareAddr
-		errExp                   bool
-		outBoolFlag              bool
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
+		outBoolFlag              bool
 	}{
 		{
 			desc:        "test path when NeighList() returns error",
@@ -909,11 +909,11 @@ func TestDeleteConntrack(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 	tests := []struct {
 		desc                     string
-		errExp                   bool
 		inputIPStr               string
-		inputPort                int32
 		inputProtocol            kapi.Protocol
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
+		inputPort                int32
+		errExp                   bool
 	}{
 		{
 			desc:       "Invalid IP address code input",
@@ -1012,13 +1012,13 @@ func TestGetIPv6OnSubnet(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
-		errExp                   bool
-		inputIface               string
 		inputIP                  *net.IPNet
 		expectedIP               *net.IPNet
+		desc                     string
+		inputIface               string
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:       "tests code path when LinkByName() returns error",
@@ -1127,12 +1127,12 @@ func TestGetMTUOfInterfaceWithAddress(t *testing.T) {
 	exisitngMockLink := new(netlink_mocks.Link)
 
 	tests := []struct {
+		netlinkOpsCallbackFunc  func()
 		desc                    string
 		interfaceAddress        net.IP
+		onRetArgsLinkIfaceOpers []ovntest.TestifyMockHelper
 		wantMTU                 int
 		wantError               bool
-		netlinkOpsCallbackFunc  func()
-		onRetArgsLinkIfaceOpers []ovntest.TestifyMockHelper
 	}{
 		{
 			desc:             "Should return error on AddrList failure",

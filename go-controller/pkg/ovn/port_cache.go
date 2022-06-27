@@ -10,20 +10,18 @@ import (
 )
 
 type portCache struct {
-	sync.RWMutex
 	stopChan <-chan struct{}
 	cache    map[string]*lpInfo
+	sync.RWMutex
 }
 
 type lpInfo struct {
+	expires       time.Time
 	name          string
 	uuid          string
 	logicalSwitch string
 	ips           []*net.IPNet
 	mac           net.HardwareAddr
-	// expires, if non-nil, indicates that this object is scheduled to be
-	// removed at the given time
-	expires time.Time
 }
 
 func newPortCache(stopChan <-chan struct{}) *portCache {

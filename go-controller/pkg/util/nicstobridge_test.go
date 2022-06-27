@@ -167,13 +167,13 @@ func TestSaveIPAddress(t *testing.T) {
 	// below is defined in net_linux.go
 	netLinkOps = mockNetLinkOps
 	tests := []struct {
-		desc                     string
 		inpOldLink               netlink.Link
 		inpNewLink               netlink.Link
+		desc                     string
 		inpAddrs                 []netlink.Addr
-		errExp                   bool
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:       "empty address list, LinkSetup(newLink) succeeds",
@@ -251,13 +251,13 @@ func TestDelAddRoute(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
-		errExp                   bool
 		inpOldLink               netlink.Link
 		inpNewLink               netlink.Link
+		desc                     string
 		inpRoute                 netlink.Route
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:       "test path where RouteDel() fails",
@@ -326,13 +326,13 @@ func TestSaveRoute(t *testing.T) {
 	netLinkOps = mockNetLinkOps
 
 	tests := []struct {
-		desc                     string
-		errExp                   bool
 		inpOldLink               netlink.Link
 		inpNewLink               netlink.Link
+		desc                     string
 		inpRoutes                []netlink.Route
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc: "providing empty routes should return no error",
@@ -417,14 +417,14 @@ func TestNicToBridge(t *testing.T) {
 	// below is defined in net_linux.go
 	netLinkOps = mockNetLinkOps
 	tests := []struct {
+		onRetArgsExecUtilsIface  *ovntest.TestifyMockHelper
+		onRetArgsKexecIface      *ovntest.TestifyMockHelper
 		desc                     string
 		inpIface                 string
 		outBridge                string
-		errExp                   bool
-		onRetArgsExecUtilsIface  *ovntest.TestifyMockHelper
-		onRetArgsKexecIface      *ovntest.TestifyMockHelper
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:     "invalid interface name fails to return a link",
@@ -588,11 +588,11 @@ func TestBridgeToNic(t *testing.T) {
 	tests := []struct {
 		desc                     string
 		inpBridge                string
-		errExp                   bool
 		onRetArgsExecUtilsIface  []ovntest.TestifyMockHelper
 		onRetArgsKexecIface      []ovntest.TestifyMockHelper
 		onRetArgsNetLinkLibOpers []ovntest.TestifyMockHelper
 		onRetArgsLinkIfaceOpers  []ovntest.TestifyMockHelper
+		errExp                   bool
 	}{
 		{
 			desc:      "invalid bridge name fails to return a link",

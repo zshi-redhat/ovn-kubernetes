@@ -11,10 +11,9 @@ import (
 var ErrSubnetAllocatorFull = fmt.Errorf("no subnets available.")
 
 type SubnetAllocator struct {
-	sync.Mutex
-
 	v4ranges []*subnetAllocatorRange
 	v6ranges []*subnetAllocatorRange
+	sync.Mutex
 }
 
 func NewSubnetAllocator() *SubnetAllocator {
@@ -128,12 +127,10 @@ func (sna *SubnetAllocator) ReleaseNetwork(subnet *net.IPNet) error {
 // subnetAllocatorRange handles allocating subnets out of a single CIDR
 type subnetAllocatorRange struct {
 	network    *net.IPNet
+	allocMap   map[string]bool
 	hostBits   uint32
 	subnetBits uint32
 	next       uint32
-	allocMap   map[string]bool
-
-	// IPv4-only address-alignment hackery; see below
 	leftShift  uint32
 	leftMask   uint32
 	rightShift uint32

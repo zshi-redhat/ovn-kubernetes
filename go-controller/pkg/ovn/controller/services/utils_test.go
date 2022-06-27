@@ -13,8 +13,8 @@ func TestServiceNeedsIdling(t *testing.T) {
 	}()
 
 	tests := []struct {
-		name        string
 		annotations map[string]string
+		name        string
 		needsIdling bool
 	}{
 		{

@@ -7,10 +7,10 @@ import "github.com/ovn-org/libovsdb/model"
 
 // DNS defines an object in DNS table
 type DNS struct {
-	UUID        string            `ovsdb:"_uuid"`
-	Datapaths   []string          `ovsdb:"datapaths"`
 	ExternalIDs map[string]string `ovsdb:"external_ids"`
 	Records     map[string]string `ovsdb:"records"`
+	UUID        string            `ovsdb:"_uuid"`
+	Datapaths   []string          `ovsdb:"datapaths"`
 }
 
 func copyDNSDatapaths(a []string) []string {

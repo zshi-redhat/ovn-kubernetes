@@ -62,170 +62,77 @@ type ACLLoggingLevels struct {
 // nsInfo.Unlock() on it when you are done with it. (No code outside of the code that
 // manages the oc.namespaces map is ever allowed to hold an unlocked namespaceInfo.)
 type namespaceInfo struct {
+	addressSet               addressset.AddressSet
+	networkPolicies          map[string]*networkPolicy
+	routingExternalPodGWs    map[string]gatewayInfo
+	aclLogging               ACLLoggingLevels
+	portGroupIngressDenyName string
+	portGroupEgressDenyName  string
+	routingExternalGWs       gatewayInfo
 	sync.RWMutex
-
-	// addressSet is an address set object that holds the IP addresses
-	// of all pods in the namespace.
-	addressSet addressset.AddressSet
-
-	// map from NetworkPolicy name to networkPolicy. You must hold the
-	// namespaceInfo's mutex to add/delete/lookup policies, but must hold the
-	// networkPolicy's mutex (and not necessarily the namespaceInfo's) to work with
-	// the policy itself.
-	networkPolicies map[string]*networkPolicy
-
-	// routingExternalGWs is a slice of net.IP containing the values parsed from
-	// annotation k8s.ovn.org/routing-external-gws
-	routingExternalGWs gatewayInfo
-
-	// routingExternalPodGWs contains a map of all pods serving as exgws as well as their
-	// exgw IPs
-	// key is <namespace>_<pod name>
-	routingExternalPodGWs map[string]gatewayInfo
-
 	multicastEnabled bool
-
-	// If not empty, then it has to be set to a logging a severity level, e.g. "notice", "alert", etc
-	aclLogging ACLLoggingLevels
-
-	// Per-namespace port group default deny UUIDs
-	portGroupIngressDenyName string // Port group Name for ingress deny rule
-	portGroupEgressDenyName  string // Port group Name for egress deny rule
 }
 
 // Controller structure is the object which holds the controls for starting
 // and reacting upon the watched resources (e.g. pods, endpoints)
 type Controller struct {
-	client       clientset.Interface
-	kube         kube.Interface
-	watchFactory *factory.WatchFactory
-	stopChan     <-chan struct{}
-
-	// FIXME DUAL-STACK -  Make IP Allocators more dual-stack friendly
-	masterSubnetAllocator *subnetallocator.SubnetAllocator
-
-	hoMaster *hocontroller.MasterController
-
-	SCTPSupport bool
-
-	// For TCP, UDP, and SCTP type traffic, cache OVN load-balancers used for the
-	// cluster's east-west traffic.
-	loadbalancerClusterCache map[kapi.Protocol]string
-
-	// A cache of all logical switches seen by the watcher and their subnets
-	lsManager *lsm.LogicalSwitchManager
-
-	// A cache of all logical ports known to the controller
-	logicalPortCache *portCache
-
-	// Info about known namespaces. You must use oc.getNamespaceLocked() or
-	// oc.waitForNamespaceLocked() to read this map, and oc.createNamespaceLocked()
-	// or oc.deleteNamespaceLocked() to modify it. namespacesMutex is only held
-	// from inside those functions.
-	namespaces      map[string]*namespaceInfo
-	namespacesMutex sync.Mutex
-
-	externalGWCache map[ktypes.NamespacedName]*externalRouteInfo
-	exGWCacheMutex  sync.RWMutex
-
-	// egressFirewalls is a map of namespaces and the egressFirewall attached to it
-	egressFirewalls sync.Map
-
-	// EgressQoS
-	egressQoSLister egressqoslisters.EgressQoSLister
-	egressQoSSynced cache.InformerSynced
-	egressQoSQueue  workqueue.RateLimitingInterface
-	egressQoSCache  sync.Map
-
-	egressQoSPodLister corev1listers.PodLister
-	egressQoSPodSynced cache.InformerSynced
-	egressQoSPodQueue  workqueue.RateLimitingInterface
-
-	egressQoSNodeLister corev1listers.NodeLister
-	egressQoSNodeSynced cache.InformerSynced
-	egressQoSNodeQueue  workqueue.RateLimitingInterface
-
-	// An address set factory that creates address sets
-	addressSetFactory addressset.AddressSetFactory
-
-	// For each logical port, the number of network policies that want
-	// to add an ingress deny rule.
-	lspIngressDenyCache map[string]int
-
-	// For each logical port, the number of network policies that want
-	// to add an egress deny rule.
-	lspEgressDenyCache map[string]int
-
-	// A mutex for lspIngressDenyCache and lspEgressDenyCache
-	lspMutex *sync.Mutex
-
-	// Supports multicast?
-	multicastSupport bool
-
-	// Cluster wide Load_Balancer_Group UUID.
-	loadBalancerGroupUUID string
-
-	// Cluster-wide gateway router default Control Plane Protection (COPP) UUID
-	defaultGatewayCOPPUUID string
-
-	// Controller used for programming OVN for egress IP
-	eIPC egressIPController
-
-	// Controller used to handle services
-	svcController *svccontroller.Controller
-	// svcFactory used to handle service related events
-	svcFactory informers.SharedInformerFactory
-
-	egressFirewallDNS *EgressDNS
-
-	// Is ACL logging enabled while configuring meters?
-	aclLoggingEnabled bool
-
-	joinSwIPManager *lsm.JoinSwitchIPManager
-
-	// event recorder used to post events to k8s
-	recorder record.EventRecorder
-
-	// libovsdb northbound client interface
-	nbClient libovsdbclient.Client
-
-	// libovsdb southbound client interface
-	sbClient libovsdbclient.Client
-
-	// v4HostSubnetsUsed keeps track of number of v4 subnets currently assigned to nodes
-	v4HostSubnetsUsed float64
-
-	// v6HostSubnetsUsed keeps track of number of v6 subnets currently assigned to nodes
-	v6HostSubnetsUsed float64
-
-	// Objects for pods that need to be retried
-	retryPods *retryObjs
-
-	// Objects for network policies that need to be retried
-	retryNetworkPolicies *retryObjs
-
-	// Objects for egress firewall that need to be retried
-	retryEgressFirewalls *retryObjs
-
-	// Objects for egress IP that need to be retried
-	retryEgressIPs *retryObjs
-	// Objects for egress IP Namespaces that need to be retried
-	retryEgressIPNamespaces *retryObjs
-	// Objects for egress IP Pods that need to be retried
-	retryEgressIPPods *retryObjs
-	// Objects for Egress nodes that need to be retried
-	retryEgressNodes *retryObjs
-	// Objects for nodes that need to be retried
-	retryNodes *retryObjs
-	// Objects for Cloud private IP config that need to be retried
-	retryCloudPrivateIPConfig *retryObjs
-	// Node-specific syncMap used by node event handler
-	gatewaysFailed              sync.Map
-	mgmtPortFailed              sync.Map
-	addNodeFailed               sync.Map
+	podRecorder                 metrics.PodRecorder
+	kube                        kube.Interface
+	sbClient                    libovsdbclient.Client
+	svcFactory                  informers.SharedInformerFactory
+	addressSetFactory           addressset.AddressSetFactory
+	egressQoSNodeQueue          workqueue.RateLimitingInterface
+	egressQoSNodeLister         corev1listers.NodeLister
+	client                      clientset.Interface
+	egressQoSPodQueue           workqueue.RateLimitingInterface
+	egressQoSPodLister          corev1listers.PodLister
+	egressQoSQueue              workqueue.RateLimitingInterface
+	egressQoSLister             egressqoslisters.EgressQoSLister
+	nbClient                    libovsdbclient.Client
+	recorder                    record.EventRecorder
+	lspIngressDenyCache         map[string]int
+	retryNodes                  *retryObjs
+	egressQoSSynced             cache.InformerSynced
+	namespaces                  map[string]*namespaceInfo
+	retryEgressIPNamespaces     *retryObjs
+	logicalPortCache            *portCache
+	egressQoSPodSynced          cache.InformerSynced
+	lsManager                   *lsm.LogicalSwitchManager
+	retryCloudPrivateIPConfig   *retryObjs
+	egressQoSNodeSynced         cache.InformerSynced
+	hoMaster                    *hocontroller.MasterController
+	masterSubnetAllocator       *subnetallocator.SubnetAllocator
+	retryEgressIPPods           *retryObjs
+	lspEgressDenyCache          map[string]int
+	lspMutex                    *sync.Mutex
+	retryEgressIPs              *retryObjs
+	retryEgressFirewalls        *retryObjs
+	retryNetworkPolicies        *retryObjs
+	retryPods                   *retryObjs
+	svcController               *svccontroller.Controller
+	stopChan                    <-chan struct{}
+	egressFirewallDNS           *EgressDNS
+	watchFactory                *factory.WatchFactory
+	joinSwIPManager             *lsm.JoinSwitchIPManager
+	externalGWCache             map[ktypes.NamespacedName]*externalRouteInfo
+	loadbalancerClusterCache    map[kapi.Protocol]string
+	retryEgressNodes            *retryObjs
+	eIPC                        egressIPController
 	nodeClusterRouterPortFailed sync.Map
-
-	podRecorder metrics.PodRecorder
+	addNodeFailed               sync.Map
+	mgmtPortFailed              sync.Map
+	gatewaysFailed              sync.Map
+	egressQoSCache              sync.Map
+	egressFirewalls             sync.Map
+	loadBalancerGroupUUID       string
+	defaultGatewayCOPPUUID      string
+	v6HostSubnetsUsed           float64
+	v4HostSubnetsUsed           float64
+	exGWCacheMutex              sync.RWMutex
+	namespacesMutex             sync.Mutex
+	SCTPSupport                 bool
+	multicastSupport            bool
+	aclLoggingEnabled           bool
 }
 
 const (

@@ -21,11 +21,11 @@ func TestRunningPlatform(t *testing.T) {
 	AppFs = afero.NewMemMapFs()
 	AppFs.MkdirAll("/etc", 0o755)
 	tests := []struct {
+		expErr          error
 		desc            string
+		expOut          string
 		fileContent     []byte
 		filePermissions os.FileMode
-		expOut          string
-		expErr          error
 	}{
 		{
 			desc:   "ReadFile returns error",
@@ -91,12 +91,12 @@ func TestRunOVNretry(t *testing.T) {
 	runner = &execHelper{exec: mockKexecIface}
 
 	tests := []struct {
-		desc                    string
-		inpCmdPath              string
-		inpEnvVars              []string
 		errMatch                error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		inpCmdPath              string
+		inpEnvVars              []string
 	}{
 		{
 			desc:                    "test path when runWithEnvVars returns no error",
@@ -150,9 +150,9 @@ func TestGetNbctlArgsAndEnv(t *testing.T) {
 		mockEnvKey   string
 		mockEnvVal   string
 		dirFileMocks []ovntest.AferoDirMockHelper
-		inpTimeout   int
 		outCmdArgs   []string
 		outEnvArgs   []string
+		inpTimeout   int
 	}{
 		{
 			desc:        "test path when config.OvnNorth.Scheme == config.OvnDBSchemeSSL",
@@ -268,12 +268,12 @@ func TestRunOVNNorthAppCtl(t *testing.T) {
 	runner.ovnRunDir = ovnRunDir
 
 	tests := []struct {
-		desc                    string
-		inpVarArgs              string
 		errMatch                error
-		dirFileMocks            []ovntest.AferoDirMockHelper
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		inpVarArgs              string
+		dirFileMocks            []ovntest.AferoDirMockHelper
 	}{
 		{
 			desc:     "test path when ReadFile returns error",
@@ -341,12 +341,12 @@ func TestRunOVNControllerAppCtl(t *testing.T) {
 	runner.ovnRunDir = ovnRunDir
 
 	tests := []struct {
-		desc                    string
-		inpVarArgs              string
 		errMatch                error
-		dirFileMocks            []ovntest.AferoDirMockHelper
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		inpVarArgs              string
+		dirFileMocks            []ovntest.AferoDirMockHelper
 	}{
 		{
 			desc:     "test path when ReadFile returns error",
@@ -412,12 +412,12 @@ func TestRunOvsVswitchdAppCtl(t *testing.T) {
 	runner = &execHelper{exec: mockKexecIface}
 
 	tests := []struct {
-		desc                    string
-		inpVarArgs              string
 		errMatch                error
-		dirFileMocks            []ovntest.AferoDirMockHelper
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		inpVarArgs              string
+		dirFileMocks            []ovntest.AferoDirMockHelper
 	}{
 		{
 			desc:     "test path when ReadFile returns error",
@@ -519,9 +519,9 @@ func TestDefaultExecRunner_RunCmd(t *testing.T) {
 func TestSetExec(t *testing.T) {
 	mockKexecIface := new(mock_k8s_io_utils_exec.Interface)
 	tests := []struct {
-		desc         string
 		expectedErr  error
 		onRetArgs    *ovntest.TestifyMockHelper
+		desc         string
 		setRunnerNil bool
 	}{
 		{
@@ -555,9 +555,9 @@ func TestSetExec(t *testing.T) {
 func TestSetExecWithoutOVS(t *testing.T) {
 	mockKexecIface := new(mock_k8s_io_utils_exec.Interface)
 	tests := []struct {
-		desc        string
 		expectedErr error
 		onRetArgs   *ovntest.TestifyMockHelper
+		desc        string
 	}{
 		{
 			desc:        "positive, ip path found",
@@ -585,10 +585,10 @@ func TestSetExecWithoutOVS(t *testing.T) {
 func TestSetSpecificExec(t *testing.T) {
 	mockKexecIface := new(mock_k8s_io_utils_exec.Interface)
 	tests := []struct {
-		desc        string
 		expectedErr error
-		fnArg       string
 		onRetArgs   *ovntest.TestifyMockHelper
+		desc        string
+		fnArg       string
 	}{
 		{
 			desc:        "positive: ovs-vsctl path found",
@@ -822,10 +822,10 @@ func TestRunOVSOfctl(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovs-ofctl` command",
@@ -884,12 +884,12 @@ OFPT_GET_CONFIG_REPLY (xid=0x4): frags=normal miss_send_len=0
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
-		expectedOut             []string
-		portNumbers             bool
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		expectedOut             []string
+		portNumbers             bool
 	}{
 		{
 			desc:        "Get port numbers",
@@ -959,10 +959,10 @@ func TestRunOVSVsctl(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovs-vsctl` command",
@@ -1000,11 +1000,11 @@ func TestRunOVSAppctlWithTimeout(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
-		timeout                 int
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		timeout                 int
 	}{
 		{
 			desc:                    "negative: run `ovs-appctl` command with timeout",
@@ -1044,10 +1044,10 @@ func TestRunOVSAppctl(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovs-appctl` command",
@@ -1085,11 +1085,11 @@ func TestRunOVNAppctlWithTimeout(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
-		timeout                 int
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		timeout                 int
 	}{
 		{
 			desc:                    "negative: run `ovn-appctl` command with timeout",
@@ -1129,11 +1129,11 @@ func TestRunOVNNbctlWithTimeout(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
-		timeout                 int
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		timeout                 int
 	}{
 		{
 			desc:                    "negative: run `ovn-nbctl` command with timeout",
@@ -1175,10 +1175,10 @@ func TestRunOVNNbctl(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovn-nbctl` command",
@@ -1218,11 +1218,11 @@ func TestRunOVNSbctlWithTimeout(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
-		timeout                 int
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		timeout                 int
 	}{
 		{
 			desc:                    "negative: run `ovn-sbctl` command with timeout",
@@ -1264,10 +1264,10 @@ func TestRunOVNSbctl(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovn-sbctl` command",
@@ -1307,10 +1307,10 @@ func TestRunOVSDBClient(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovsdb-client` command",
@@ -1350,10 +1350,10 @@ func TestRunOVSDBTool(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovsdb-tool` command",
@@ -1393,10 +1393,10 @@ func TestRunOVSDBClientOVNNB(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovsdb-client` command against OVN NB database",
@@ -1436,10 +1436,10 @@ func TestRunOVNNBAppCtl(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovn-appctl -t nbdbCtlSockPath` command",
@@ -1479,10 +1479,10 @@ func TestRunOVNSBAppCtl(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovn-appctl -t sbdbCtlSockPath` command",
@@ -1522,10 +1522,10 @@ func TestRunIP(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "positive: run IP ",
@@ -1557,11 +1557,11 @@ func TestAddOFFlowWithSpecificAction(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
 		onRetArgsCmdList        *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovs-ofctl` command",
@@ -1604,11 +1604,11 @@ func TestReplaceOFFlows(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
 		expectedErr             error
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
 		onRetArgsCmdList        *ovntest.TestifyMockHelper
+		desc                    string
 	}{
 		{
 			desc:                    "negative: run `ovs-ofctl` command",
@@ -1651,10 +1651,10 @@ func TestGetOVNDBServerInfo(t *testing.T) {
 	// note runner is defined in ovs.go file
 	runner = &execHelper{exec: mockKexecIface}
 	tests := []struct {
-		desc                    string
-		expectedErr             bool
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		expectedErr             bool
 	}{
 		{
 			desc:                    "negative: executable not found",
@@ -1707,10 +1707,10 @@ func TestDetectSCTPSupport(t *testing.T) {
 	runner = &execHelper{exec: mockKexecIface}
 
 	tests := []struct {
-		desc                    string
-		expectedErr             bool
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		expectedErr             bool
 	}{
 		{
 			desc:                    "negative: fails to query OVN NB DB for SCTP support",

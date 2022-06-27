@@ -21,24 +21,16 @@ const (
 )
 
 type dnsValue struct {
-	// All IP addresses for a given domain name
-	ips []net.IP
-	// Time-to-live value from non-authoritative/cached name server for the domain
-	ttl time.Duration
-	// Holds (last dns lookup time + ttl), tells when to refresh IPs next time
 	nextQueryTime time.Time
+	ips           []net.IP
+	ttl           time.Duration
 }
 
 type DNS struct {
-	// Protects dnsMap operations
-	lock sync.Mutex
-	// Holds dns name and its corresponding information
-	dnsMap map[string]dnsValue
-
-	// DNS resolvers
+	dnsMap      map[string]dnsValue
+	port        string
 	nameservers []string
-	// DNS port
-	port string
+	lock        sync.Mutex
 }
 
 func NewDNS(resolverConfigFile string) (*DNS, error) {

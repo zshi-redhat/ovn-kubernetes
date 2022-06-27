@@ -7,9 +7,9 @@ import (
 
 func Test_parseStopwatchShowOutput(t *testing.T) {
 	tests := []struct {
+		want                map[string]stopwatchStatistics
 		name                string
 		stopwatchShowOutput string
-		want                map[string]stopwatchStatistics
 	}{
 		{
 			name: "should return all metrics",

@@ -31,11 +31,11 @@ type nodeController interface {
 
 // Node is a node controller and it's informers
 type Node struct {
-	ready            bool
 	controller       nodeController
 	nodeEventHandler informer.EventHandler
 	podEventHandler  informer.EventHandler
 	sync.Mutex
+	ready bool
 }
 
 func (n *Node) IsReady() bool {

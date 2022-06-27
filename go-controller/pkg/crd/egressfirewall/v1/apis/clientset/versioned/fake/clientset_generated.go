@@ -61,9 +61,9 @@ func NewSimpleClientset(objects ...runtime.Object) *Clientset {
 // struct to get a default implementation. This makes faking out just the method
 // you want to test easier.
 type Clientset struct {
-	testing.Fake
-	discovery *fakediscovery.FakeDiscovery
 	tracker   testing.ObjectTracker
+	discovery *fakediscovery.FakeDiscovery
+	testing.Fake
 }
 
 func (c *Clientset) Discovery() discovery.DiscoveryInterface {

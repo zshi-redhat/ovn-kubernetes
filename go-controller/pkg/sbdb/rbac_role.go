@@ -7,9 +7,9 @@ import "github.com/ovn-org/libovsdb/model"
 
 // RBACRole defines an object in RBAC_Role table
 type RBACRole struct {
+	Permissions map[string]string `ovsdb:"permissions"`
 	UUID        string            `ovsdb:"_uuid"`
 	Name        string            `ovsdb:"name"`
-	Permissions map[string]string `ovsdb:"permissions"`
 }
 
 func copyRBACRolePermissions(a map[string]string) map[string]string {

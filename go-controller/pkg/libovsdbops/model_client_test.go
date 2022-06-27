@@ -28,14 +28,14 @@ var (
 )
 
 type OperationModelTestCase struct {
+	expectedOpsErr error
+	generateOp     func() []operationModel
 	name           string
 	op             string
-	generateOp     func() []operationModel
-	interleaveOp   bool
 	initialDB      []libovsdbtest.TestData
 	expectedDB     []libovsdbtest.TestData
 	expectedRes    [][]libovsdbtest.TestData
-	expectedOpsErr error
+	interleaveOp   bool
 	expectedTxnErr bool
 }
 

@@ -24,25 +24,15 @@ import (
 )
 
 type gressPolicy struct {
-	policyNamespace string
-	policyName      string
-	policyType      knet.PolicyType
-	idx             int
-
-	// peerAddressSet points to the addressSet that holds all peer pod
-	// IP addresess.
-	peerAddressSet addressset.AddressSet
-
-	// peerV4AddressSets has Address sets for all namespaces and pod selectors for IPv4
-	peerV4AddressSets sets.String
-	// peerV6AddressSets has Address sets for all namespaces and pod selectors for IPv6
+	peerAddressSet    addressset.AddressSet
 	peerV6AddressSets sets.String
-
-	// portPolicies represents all the ports to which traffic is allowed for
-	// the rule in question.
-	portPolicies []*portPolicy
-
-	ipBlock []*knet.IPBlock
+	peerV4AddressSets sets.String
+	policyName        string
+	policyType        knet.PolicyType
+	policyNamespace   string
+	portPolicies      []*portPolicy
+	ipBlock           []*knet.IPBlock
+	idx               int
 }
 
 type portPolicy struct {

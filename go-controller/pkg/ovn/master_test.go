@@ -1635,16 +1635,15 @@ func newLoadBalancerGroup() *nbdb.LoadBalancerGroup {
 
 func TestController_allocateNodeSubnets(t *testing.T) {
 	tests := []struct {
+		node          *kapi.Node
 		name          string
 		networkRanges []string
+		wantStr       []string
 		networkLen    int
+		allocated     int
 		configIPv4    bool
 		configIPv6    bool
-		node          *kapi.Node
-		// to be converted during the test to []*net.IPNet
-		wantStr   []string
-		allocated int
-		wantErr   bool
+		wantErr       bool
 	}{
 		{
 			name:          "new node, IPv4 only cluster",

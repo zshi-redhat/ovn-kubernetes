@@ -7,13 +7,13 @@ import "github.com/ovn-org/libovsdb/model"
 
 // SBGlobal defines an object in SB_Global table
 type SBGlobal struct {
+	SSL         *string           `ovsdb:"ssl"`
+	ExternalIDs map[string]string `ovsdb:"external_ids"`
+	Options     map[string]string `ovsdb:"options"`
 	UUID        string            `ovsdb:"_uuid"`
 	Connections []string          `ovsdb:"connections"`
-	ExternalIDs map[string]string `ovsdb:"external_ids"`
-	Ipsec       bool              `ovsdb:"ipsec"`
 	NbCfg       int               `ovsdb:"nb_cfg"`
-	Options     map[string]string `ovsdb:"options"`
-	SSL         *string           `ovsdb:"ssl"`
+	Ipsec       bool              `ovsdb:"ipsec"`
 }
 
 func copySBGlobalConnections(a []string) []string {

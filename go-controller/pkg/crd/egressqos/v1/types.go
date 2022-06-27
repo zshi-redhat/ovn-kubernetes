@@ -32,11 +32,10 @@ import (
 // the namespace's EgressQoS, and if there is a match the traffic is marked
 // with the relevant DSCP value.
 type EgressQoS struct {
+	Status            EgressQoSStatus `json:"status,omitempty"`
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   EgressQoSSpec   `json:"spec,omitempty"`
-	Status EgressQoSStatus `json:"status,omitempty"`
+	Spec              EgressQoSSpec `json:"spec,omitempty"`
 }
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -49,23 +48,9 @@ type EgressQoSSpec struct {
 }
 
 type EgressQoSRule struct {
-	// DSCP marking value for matching pods' traffic.
-	// +kubebuilder:validation:Maximum:=63
-	// +kubebuilder:validation:Minimum:=0
-	DSCP int `json:"dscp"`
-
-	// DstCIDR specifies the destination's CIDR. Only traffic heading
-	// to this CIDR will be marked with the DSCP value.
-	// This field is optional, and in case it is not set the rule is applied
-	// to all egress traffic regardless of the destination.
-	// +optional
-	DstCIDR *string `json:"dstCIDR,omitempty"`
-
-	// PodSelector applies the QoS rule only to the pods in the namespace whose label
-	// matches this definition. This field is optional, and in case it is not set
-	// results in the rule being applied to all pods in the namespace.
-	// +optional
+	DstCIDR     *string              `json:"dstCIDR,omitempty"`
 	PodSelector metav1.LabelSelector `json:"podSelector,omitempty"`
+	DSCP        int                  `json:"dscp"`
 }
 
 // EgressQoSStatus defines the observed state of EgressQoS

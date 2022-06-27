@@ -37,16 +37,13 @@ type SharedInformerOption func(*sharedInformerFactory) *sharedInformerFactory
 
 type sharedInformerFactory struct {
 	client           versioned.Interface
-	namespace        string
-	tweakListOptions internalinterfaces.TweakListOptionsFunc
-	lock             sync.Mutex
-	defaultResync    time.Duration
-	customResync     map[reflect.Type]time.Duration
-
-	informers map[reflect.Type]cache.SharedIndexInformer
-	// startedInformers is used for tracking which informers have been started.
-	// This allows Start() to be called multiple times safely.
 	startedInformers map[reflect.Type]bool
+	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	customResync     map[reflect.Type]time.Duration
+	informers        map[reflect.Type]cache.SharedIndexInformer
+	namespace        string
+	defaultResync    time.Duration
+	lock             sync.Mutex
 }
 
 // WithCustomResyncConfig sets a custom resync period for the specified informer types.

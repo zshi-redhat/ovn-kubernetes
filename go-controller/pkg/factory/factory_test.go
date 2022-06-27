@@ -635,11 +635,11 @@ var _ = Describe("Watch Factory Operations", func() {
 
 		const nodeName string = "mynode"
 		type opTest struct {
-			mu      sync.Mutex
 			pod     *v1.Pod
 			added   int
 			updated int
 			deleted int
+			mu      sync.Mutex
 		}
 		testPods := make(map[string]*opTest)
 
@@ -789,11 +789,11 @@ var _ = Describe("Watch Factory Operations", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		type opTest struct {
-			mu      sync.Mutex
 			node    *v1.Node
 			added   int
 			updated int
 			deleted int
+			mu      sync.Mutex
 		}
 		testNodes := make(map[string]*opTest)
 
@@ -866,10 +866,10 @@ var _ = Describe("Watch Factory Operations", func() {
 
 	It("correctly orders queued informer initial add events and subsequent update events", func() {
 		type opTest struct {
-			mu      sync.Mutex
 			node    *v1.Node
 			added   int
 			updated int
+			mu      sync.Mutex
 		}
 		testNodes := make(map[string]*opTest)
 
@@ -945,10 +945,10 @@ var _ = Describe("Watch Factory Operations", func() {
 
 	It("correctly orders serialized informer initial add events and subsequent update events", func() {
 		type opTest struct {
-			mu        sync.Mutex
 			namespace *v1.Namespace
 			added     int
 			updated   int
+			mu        sync.Mutex
 		}
 		testNamespaces := make(map[string]*opTest)
 

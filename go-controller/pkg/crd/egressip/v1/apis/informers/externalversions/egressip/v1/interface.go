@@ -30,8 +30,8 @@ type Interface interface {
 
 type version struct {
 	factory          internalinterfaces.SharedInformerFactory
-	namespace        string
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
+	namespace        string
 }
 
 // New returns a new Interface.

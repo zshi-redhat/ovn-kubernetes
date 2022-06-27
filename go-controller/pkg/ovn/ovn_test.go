@@ -37,17 +37,17 @@ const (
 )
 
 type FakeOVN struct {
-	fakeClient   *util.OVNClientset
-	watcher      *factory.WatchFactory
+	nbClient     libovsdbclient.Client
+	sbClient     libovsdbclient.Client
 	controller   *Controller
 	stopChan     chan struct{}
 	asf          *addressset.FakeAddressSetFactory
 	fakeRecorder *record.FakeRecorder
-	nbClient     libovsdbclient.Client
-	sbClient     libovsdbclient.Client
-	dbSetup      libovsdbtest.TestSetup
+	fakeClient   *util.OVNClientset
+	watcher      *factory.WatchFactory
 	nbsbCleanup  *libovsdbtest.Cleanup
 	egressQoSWg  *sync.WaitGroup
+	dbSetup      libovsdbtest.TestSetup
 }
 
 func NewFakeOVN() *FakeOVN {

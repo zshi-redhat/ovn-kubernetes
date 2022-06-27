@@ -15,10 +15,10 @@ var (
 
 // MeterBand defines an object in Meter_Band table
 type MeterBand struct {
+	ExternalIDs map[string]string `ovsdb:"external_ids"`
 	UUID        string            `ovsdb:"_uuid"`
 	Action      MeterBandAction   `ovsdb:"action"`
 	BurstSize   int               `ovsdb:"burst_size"`
-	ExternalIDs map[string]string `ovsdb:"external_ids"`
 	Rate        int               `ovsdb:"rate"`
 }
 

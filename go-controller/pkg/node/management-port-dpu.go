@@ -16,8 +16,8 @@ import (
 
 type managementPortDPU struct {
 	nodeName    string
-	hostSubnets []*net.IPNet
 	vfRepName   string
+	hostSubnets []*net.IPNet
 }
 
 // newManagementPortDPU creates a new managementPortDPU
@@ -100,8 +100,8 @@ func (mpo *managementPortDPU) CheckManagementPortHealth(cfg *managementPortConfi
 }
 
 type managementPortDPUHost struct {
-	hostSubnets []*net.IPNet
 	netdevName  string
+	hostSubnets []*net.IPNet
 }
 
 // newManagementPortDPUHost creates a new managementPortDPUHost

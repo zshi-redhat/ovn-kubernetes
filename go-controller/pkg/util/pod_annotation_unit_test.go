@@ -16,11 +16,11 @@ import (
 
 func TestMarshalPodAnnotation(t *testing.T) {
 	tests := []struct {
+		errMatch       error
+		expectedOutput map[string]interface{}
 		desc           string
 		inpPodAnnot    PodAnnotation
-		errAssert      bool  // used when an error string CANNOT be matched or sub-matched
-		errMatch       error //used when an error string CAN be matched or sub-matched
-		expectedOutput map[string]interface{}
+		errAssert      bool
 	}{
 		{
 			desc:           "PodAnnotation instance with no fields set",
@@ -119,10 +119,10 @@ func TestMarshalPodAnnotation(t *testing.T) {
 
 func TestUnmarshalPodAnnotation(t *testing.T) {
 	tests := []struct {
-		desc        string
-		inpAnnotMap map[string]string
-		errAssert   bool
 		errMatch    error
+		inpAnnotMap map[string]string
+		desc        string
+		errAssert   bool
 	}{
 		{
 			desc:        "verify `OVN pod annotation not found` error thrown",
@@ -215,11 +215,11 @@ func TestUnmarshalPodAnnotation(t *testing.T) {
 
 func TestGetAllPodIPs(t *testing.T) {
 	tests := []struct {
-		desc      string
-		inpPod    *v1.Pod
-		errAssert bool
 		errMatch  error
+		inpPod    *v1.Pod
+		desc      string
 		outExp    []net.IP
+		errAssert bool
 	}{
 		// TODO: The function body may need to check that pod input is non-nil to avoid panic ?
 		/*{

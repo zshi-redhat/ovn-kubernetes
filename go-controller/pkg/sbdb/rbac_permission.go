@@ -8,10 +8,10 @@ import "github.com/ovn-org/libovsdb/model"
 // RBACPermission defines an object in RBAC_Permission table
 type RBACPermission struct {
 	UUID          string   `ovsdb:"_uuid"`
-	Authorization []string `ovsdb:"authorization"`
-	InsertDelete  bool     `ovsdb:"insert_delete"`
 	Table         string   `ovsdb:"table"`
+	Authorization []string `ovsdb:"authorization"`
 	Update        []string `ovsdb:"update"`
+	InsertDelete  bool     `ovsdb:"insert_delete"`
 }
 
 func copyRBACPermissionAuthorization(a []string) []string {

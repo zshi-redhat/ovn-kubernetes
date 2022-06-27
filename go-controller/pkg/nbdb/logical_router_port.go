@@ -7,18 +7,18 @@ import "github.com/ovn-org/libovsdb/model"
 
 // LogicalRouterPort defines an object in Logical_Router_Port table
 type LogicalRouterPort struct {
-	UUID           string            `ovsdb:"_uuid"`
+	Ipv6RaConfigs  map[string]string `ovsdb:"ipv6_ra_configs"`
 	Enabled        *bool             `ovsdb:"enabled"`
 	ExternalIDs    map[string]string `ovsdb:"external_ids"`
-	GatewayChassis []string          `ovsdb:"gateway_chassis"`
 	HaChassisGroup *string           `ovsdb:"ha_chassis_group"`
-	Ipv6Prefix     []string          `ovsdb:"ipv6_prefix"`
-	Ipv6RaConfigs  map[string]string `ovsdb:"ipv6_ra_configs"`
+	Peer           *string           `ovsdb:"peer"`
+	Options        map[string]string `ovsdb:"options"`
+	UUID           string            `ovsdb:"_uuid"`
 	MAC            string            `ovsdb:"mac"`
 	Name           string            `ovsdb:"name"`
+	GatewayChassis []string          `ovsdb:"gateway_chassis"`
 	Networks       []string          `ovsdb:"networks"`
-	Options        map[string]string `ovsdb:"options"`
-	Peer           *string           `ovsdb:"peer"`
+	Ipv6Prefix     []string          `ovsdb:"ipv6_prefix"`
 }
 
 func copyLogicalRouterPortEnabled(a *bool) *bool {

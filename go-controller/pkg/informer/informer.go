@@ -27,24 +27,13 @@ type EventHandler interface {
 }
 
 type eventHandler struct {
-	// name of the handler. used in log messages
-	name string
-	// informer is the underlying SharedIndexInformer that we're wrapping
-	informer cache.SharedIndexInformer
-	// deletedIndexer stores copies of objects that have been deleted from
-	// the cache. This is needed as the OVN controller Delete functions expect
-	// to have a copy of the object that needs deleting
+	informer       cache.SharedIndexInformer
 	deletedIndexer cache.Indexer
-	// workqueue is the queue we use to store work
-	workqueue workqueue.RateLimitingInterface
-	// add is the handler function that gets called when something has been added/updated
-	add func(obj interface{}) error
-	// delete is handler function that gets called when something has been deleted
-	delete func(obj interface{}) error
-	// updateFilter is the function that we use to evaluate whether an update
-	// should be enqueued or not. This is required to avoid an unrelated annotation
-	// change triggering hundreds of OVN commands being run
-	updateFilter UpdateFilterFunction
+	workqueue      workqueue.RateLimitingInterface
+	updateFilter   UpdateFilterFunction
+	add            func(obj interface{}) error
+	delete         func(obj interface{}) error
+	name           string
 }
 
 // UpdateFilterFunction returns true if the update is interesting

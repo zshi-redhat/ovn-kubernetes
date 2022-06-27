@@ -67,13 +67,10 @@ func (e *ErrNotInRange) Error() string {
 //     |                              |
 //   offset #0 of r.allocated   last offset of r.allocated
 type Range struct {
-	net *net.IPNet
-	// base is a cached version of the start IP in the CIDR range as a *big.Int
-	base *big.Int
-	// max is the maximum size of the usable addresses in the range
-	max int
-
 	alloc allocator.Interface
+	net   *net.IPNet
+	base  *big.Int
+	max   int
 }
 
 // NewAllocatorCIDRRange creates a Range over a net.IPNet, calling allocatorFactory to construct the backing store.

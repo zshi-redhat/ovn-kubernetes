@@ -17,13 +17,13 @@ var (
 
 // LogicalRouterPolicy defines an object in Logical_Router_Policy table
 type LogicalRouterPolicy struct {
-	UUID        string                    `ovsdb:"_uuid"`
-	Action      LogicalRouterPolicyAction `ovsdb:"action"`
-	ExternalIDs map[string]string         `ovsdb:"external_ids"`
-	Match       string                    `ovsdb:"match"`
-	Nexthop     *string                   `ovsdb:"nexthop"`
-	Nexthops    []string                  `ovsdb:"nexthops"`
 	Options     map[string]string         `ovsdb:"options"`
+	ExternalIDs map[string]string         `ovsdb:"external_ids"`
+	Nexthop     *string                   `ovsdb:"nexthop"`
+	Action      LogicalRouterPolicyAction `ovsdb:"action"`
+	Match       string                    `ovsdb:"match"`
+	UUID        string                    `ovsdb:"_uuid"`
+	Nexthops    []string                  `ovsdb:"nexthops"`
 	Priority    int                       `ovsdb:"priority"`
 }
 

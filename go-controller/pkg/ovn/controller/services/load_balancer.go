@@ -22,20 +22,13 @@ const placeholderNodeIPs = "node"
 // lbConfig is the abstract desired load balancer configuration.
 // vips and endpoints are mixed families.
 type lbConfig struct {
-	vips     []string    // just ip or the special value "node" for the node's physical IPs (i.e. NodePort)
-	protocol v1.Protocol // TCP, UDP, or SCTP
-	inport   int32       // the incoming (virtual) port number
-	eps      util.LbEndpoints
-
-	// if true, then vips added on the router are in "local" mode
-	// that means, skipSNAT, and remove any non-local endpoints.
-	// (see below)
+	protocol             v1.Protocol
+	vips                 []string
+	eps                  util.LbEndpoints
+	inport               int32
 	externalTrafficLocal bool
-	// if true, then vips added on the switch are in "local" mode
-	// that means, remove any non-local endpoints.
 	internalTrafficLocal bool
-	// indicates if this LB is configuring service of type NodePort.
-	hasNodePort bool
+	hasNodePort          bool
 }
 
 // just used for consistent ordering

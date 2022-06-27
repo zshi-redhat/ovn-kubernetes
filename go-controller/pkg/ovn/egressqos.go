@@ -38,20 +38,20 @@ const (
 )
 
 type egressQoS struct {
-	sync.RWMutex
 	name      string
 	namespace string
 	rules     []*egressQoSRule
-	stale     bool
+	sync.RWMutex
+	stale bool
 }
 
 type egressQoSRule struct {
+	addrSet     addressset.AddressSet
+	pods        *sync.Map
+	destination string
+	podSelector metav1.LabelSelector
 	priority    int
 	dscp        int
-	destination string
-	addrSet     addressset.AddressSet
-	pods        *sync.Map // pods name -> ips in the addrSet
-	podSelector metav1.LabelSelector
 }
 
 // shallow copies the EgressQoS object provided.

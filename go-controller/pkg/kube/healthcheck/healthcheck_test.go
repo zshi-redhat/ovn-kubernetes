@@ -83,8 +83,8 @@ func (fake *fakeHTTPServerFactory) New(addr string, handler http.Handler) HTTPSe
 }
 
 type fakeHTTPServer struct {
-	addr    string
 	handler http.Handler
+	addr    string
 }
 
 func (fake *fakeHTTPServer) Serve(listener net.Listener) error {

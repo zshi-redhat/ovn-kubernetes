@@ -24,13 +24,9 @@ const (
 // will be allowed by default.
 type EgressFirewall struct {
 	metav1.TypeMeta   `json:",inline"`
+	Status            EgressFirewallStatus `json:"status,omitempty"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	// Specification of the desired behavior of EgressFirewall.
-	Spec EgressFirewallSpec `json:"spec"`
-	// Observed status of EgressFirewall
-	// +optional
-	Status EgressFirewallStatus `json:"status,omitempty"`
+	Spec              EgressFirewallSpec `json:"spec"`
 }
 
 type EgressFirewallStatus struct {
@@ -45,13 +41,9 @@ type EgressFirewallSpec struct {
 
 // EgressFirewallRule is a single egressfirewall rule object
 type EgressFirewallRule struct {
-	// type marks this as an "Allow" or "Deny" rule
-	Type EgressFirewallRuleType `json:"type"`
-	// ports specify what ports and protocols the rule applies to
-	// +optional
-	Ports []EgressFirewallPort `json:"ports,omitempty"`
-	// to is the target that traffic is allowed/denied to
-	To EgressFirewallDestination `json:"to"`
+	To    EgressFirewallDestination `json:"to"`
+	Type  EgressFirewallRuleType    `json:"type"`
+	Ports []EgressFirewallPort      `json:"ports,omitempty"`
 }
 
 // EgressFirewallPort specifies the port to allow or deny traffic to

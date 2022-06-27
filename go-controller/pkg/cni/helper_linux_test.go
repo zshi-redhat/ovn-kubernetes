@@ -32,8 +32,8 @@ func TestRenameLink(t *testing.T) {
 		desc                 string
 		inpCurrName          string
 		inpNewName           string
-		errExp               bool
 		netLinkOpsMockHelper []ovntest.TestifyMockHelper
+		errExp               bool
 	}{
 		{
 			desc:        "test code path when LinkByName() errors out",
@@ -341,16 +341,16 @@ func TestSetupInterface(t *testing.T) {
 	}*/
 
 	tests := []struct {
-		desc                 string
+		errMatch             error
 		inpNetNS             ns.NetNS
+		inpPodIfaceInfo      *PodInterfaceInfo
 		inpContID            string
 		inpIfaceName         string
-		inpPodIfaceInfo      *PodInterfaceInfo
-		errExp               bool
-		errMatch             error
+		desc                 string
 		cniPluginMockHelper  []ovntest.TestifyMockHelper
 		nsMockHelper         []ovntest.TestifyMockHelper
 		netLinkOpsMockHelper []ovntest.TestifyMockHelper
+		errExp               bool
 	}{
 		{
 			desc:         "test code path when Do() returns error",
@@ -428,19 +428,19 @@ func TestSetupSriovInterface(t *testing.T) {
 	}*/
 
 	tests := []struct {
-		desc                 string
+		errMatch             error
 		inpNetNS             ns.NetNS
+		inpPodIfaceInfo      *PodInterfaceInfo
 		inpContID            string
 		inpIfaceName         string
-		inpPodIfaceInfo      *PodInterfaceInfo
 		inpPCIAddrs          string
-		errExp               bool
-		errMatch             error
+		desc                 string
+		linkMockHelper       []ovntest.TestifyMockHelper
 		cniPluginMockHelper  []ovntest.TestifyMockHelper
 		nsMockHelper         []ovntest.TestifyMockHelper
 		netLinkOpsMockHelper []ovntest.TestifyMockHelper
 		sriovOpsMockHelper   []ovntest.TestifyMockHelper
-		linkMockHelper       []ovntest.TestifyMockHelper
+		errExp               bool
 	}{
 		{
 			desc:         "test code path when GetUplinkRepresentor() returns error",

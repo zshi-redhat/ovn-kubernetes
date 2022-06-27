@@ -21,11 +21,11 @@ import (
 // ServiceTypeLoadBalancer services
 
 type loadBalancerHealthChecker struct {
-	sync.Mutex
-	nodeName  string
 	server    healthcheck.Server
 	services  map[ktypes.NamespacedName]uint16
 	endpoints map[ktypes.NamespacedName]int
+	nodeName  string
+	sync.Mutex
 }
 
 func newLoadBalancerHealthChecker(nodeName string) *loadBalancerHealthChecker {
@@ -180,8 +180,8 @@ func checkForStaleOVSRepresentorInterfaces(nodeName string, wf factory.ObjectCac
 
 	// parse this data into local struct
 	type interfaceInfo struct {
-		Name       string
 		Attributes map[string]string
+		Name       string
 	}
 
 	lines := strings.Split(out, "\n")
@@ -262,13 +262,11 @@ func checkForStaleOVSInterfaces(nodeName string, wf factory.ObjectCacheInterface
 type openflowManager struct {
 	defaultBridge         *bridgeConfiguration
 	externalGatewayBridge *bridgeConfiguration
-	// flow cache, use map instead of array for readability when debugging
-	flowCache     map[string][]string
-	flowMutex     sync.Mutex
-	exGWFlowCache map[string][]string
-	exGWFlowMutex sync.Mutex
-	// channel to indicate we need to update flows immediately
-	flowChan chan struct{}
+	flowCache             map[string][]string
+	exGWFlowCache         map[string][]string
+	flowChan              chan struct{}
+	flowMutex             sync.Mutex
+	exGWFlowMutex         sync.Mutex
 }
 
 func (c *openflowManager) updateFlowCacheEntry(key string, flows []string) {

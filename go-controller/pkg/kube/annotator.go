@@ -17,9 +17,8 @@ type Annotator interface {
 
 type nodeAnnotator struct {
 	kube     Interface
+	changes  map[string]interface{}
 	nodeName string
-
-	changes map[string]interface{}
 	sync.Mutex
 }
 
@@ -84,10 +83,9 @@ func NewPodAnnotator(kube Interface, podName string, namespace string) Annotator
 
 type podAnnotator struct {
 	kube      Interface
+	changes   map[string]interface{}
 	podName   string
 	namespace string
-
-	changes map[string]interface{}
 	sync.Mutex
 }
 
@@ -143,9 +141,8 @@ func NewNamespaceAnnotator(kube Interface, namespaceName string) Annotator {
 
 type namespaceAnnotator struct {
 	kube          Interface
+	changes       map[string]interface{}
 	namespaceName string
-
-	changes map[string]interface{}
 	sync.Mutex
 }
 

@@ -528,11 +528,11 @@ type record struct {
 }
 
 type item struct {
-	op        operation
 	timestamp time.Time
 	old       model.Model
 	new       model.Model
 	uid       kapimtypes.UID
+	op        operation
 }
 
 type PodRecorder struct {
@@ -752,18 +752,12 @@ type ovnMeasurement struct {
 
 // measurement stores a measurement attempt through OVN-Kubernetes master and optionally OVN
 type measurement struct {
-	// kubernetes kind e.g. pod or service
-	kind string
-	// time when Add is executed
-	startTimestamp time.Time
-	// time when End is executed
-	endTimestamp time.Time
-	// if true endTimestamp is valid
-	end bool
-	// time when this measurement expires. Set during Add
-	expiresAt time.Time
-	// OVN measurement(s) via AddOVN
+	startTimestamp  time.Time
+	endTimestamp    time.Time
+	expiresAt       time.Time
+	kind            string
 	ovnMeasurements []ovnMeasurement
+	end             bool
 }
 
 // hvCfgUpdate holds the information received from OVN Northbound event handler
@@ -774,13 +768,10 @@ type hvCfgUpdate struct {
 }
 
 type ConfigDurationRecorder struct {
-	// rate at which measurements are allowed. Probabilistically, 1 in every measurementRate
-	measurementRate uint64
-	measurements    map[string]measurement
-	// controls RW access to measurements map
-	measurementsMu sync.RWMutex
-	// channel to trigger processing a measurement following call to End func. Channel string is kind/namespace/name
+	measurements     map[string]measurement
 	triggerProcessCh chan string
+	measurementRate  uint64
+	measurementsMu   sync.RWMutex
 	enabled          bool
 }
 

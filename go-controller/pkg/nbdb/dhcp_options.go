@@ -7,10 +7,10 @@ import "github.com/ovn-org/libovsdb/model"
 
 // DHCPOptions defines an object in DHCP_Options table
 type DHCPOptions struct {
-	UUID        string            `ovsdb:"_uuid"`
-	Cidr        string            `ovsdb:"cidr"`
 	ExternalIDs map[string]string `ovsdb:"external_ids"`
 	Options     map[string]string `ovsdb:"options"`
+	UUID        string            `ovsdb:"_uuid"`
+	Cidr        string            `ovsdb:"cidr"`
 }
 
 func copyDHCPOptionsExternalIDs(a map[string]string) map[string]string {

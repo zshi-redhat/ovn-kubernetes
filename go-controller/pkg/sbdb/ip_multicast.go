@@ -7,18 +7,18 @@ import "github.com/ovn-org/libovsdb/model"
 
 // IPMulticast defines an object in IP_Multicast table
 type IPMulticast struct {
-	UUID          string `ovsdb:"_uuid"`
-	Datapath      string `ovsdb:"datapath"`
-	Enabled       *bool  `ovsdb:"enabled"`
-	EthSrc        string `ovsdb:"eth_src"`
-	IdleTimeout   *int   `ovsdb:"idle_timeout"`
-	Ip4Src        string `ovsdb:"ip4_src"`
-	Ip6Src        string `ovsdb:"ip6_src"`
 	Querier       *bool  `ovsdb:"querier"`
-	QueryInterval *int   `ovsdb:"query_interval"`
+	Enabled       *bool  `ovsdb:"enabled"`
 	QueryMaxResp  *int   `ovsdb:"query_max_resp"`
-	SeqNo         int    `ovsdb:"seq_no"`
+	IdleTimeout   *int   `ovsdb:"idle_timeout"`
 	TableSize     *int   `ovsdb:"table_size"`
+	QueryInterval *int   `ovsdb:"query_interval"`
+	UUID          string `ovsdb:"_uuid"`
+	Ip6Src        string `ovsdb:"ip6_src"`
+	Datapath      string `ovsdb:"datapath"`
+	EthSrc        string `ovsdb:"eth_src"`
+	Ip4Src        string `ovsdb:"ip4_src"`
+	SeqNo         int    `ovsdb:"seq_no"`
 }
 
 func copyIPMulticastEnabled(a *bool) *bool {

@@ -17,9 +17,9 @@ var (
 // Meter defines an object in Meter table
 type Meter struct {
 	UUID  string    `ovsdb:"_uuid"`
-	Bands []string  `ovsdb:"bands"`
 	Name  string    `ovsdb:"name"`
 	Unit  MeterUnit `ovsdb:"unit"`
+	Bands []string  `ovsdb:"bands"`
 }
 
 func copyMeterBands(a []string) []string {

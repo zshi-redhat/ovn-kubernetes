@@ -74,18 +74,16 @@ type queueMapEntry struct {
 }
 
 type informer struct {
-	sync.RWMutex
-	oType    reflect.Type
-	inf      cache.SharedIndexInformer
-	handlers map[uint64]*Handler
-	events   []chan *event
-	lister   listerInterface
-	// initialAddFunc will be called to deliver the initial list of objects
-	// when a handler is added
+	oType          reflect.Type
+	inf            cache.SharedIndexInformer
+	lister         listerInterface
 	initialAddFunc initialAddFn
-	shutdownWg     sync.WaitGroup
+	handlers       map[uint64]*Handler
 	queueMap       map[ktypes.NamespacedName]*queueMapEntry
-	queueMapLock   sync.Mutex
+	events         []chan *event
+	shutdownWg     sync.WaitGroup
+	sync.RWMutex
+	queueMapLock sync.Mutex
 }
 
 func (i *informer) forEachQueuedHandler(f func(h *Handler)) {

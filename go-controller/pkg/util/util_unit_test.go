@@ -57,10 +57,10 @@ func TestGetNodeChassisID(t *testing.T) {
 	runner = &execHelper{exec: mockKexecIface}
 
 	tests := []struct {
-		desc                    string
-		errExpected             bool
 		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
 		onRetArgsKexecIface     *ovntest.TestifyMockHelper
+		desc                    string
+		errExpected             bool
 	}{
 		{
 			desc:                    "ovs-vsctl command returns error",
@@ -168,9 +168,10 @@ func TestUpdateIPsSlice(t *testing.T) {
 func TestFilterIPsSlice(t *testing.T) {
 
 	var tests = []struct {
-		s, cidrs []string
-		keep     bool
-		want     []string
+		s     []string
+		cidrs []string
+		want  []string
+		keep  bool
 	}{
 		{
 			s:     []string{"1.0.0.1", "2.0.0.1", "2001::1", "2002::1"},
@@ -249,9 +250,9 @@ func TestUpdateNodeSwitchExcludeIPs(t *testing.T) {
 	tests := []struct {
 		desc                    string
 		inpSubnetStr            string
-		setCfgHybridOvlyEnabled bool
 		initialNbdb             libovsdbtest.TestSetup
 		expectedNbdb            libovsdbtest.TestSetup
+		setCfgHybridOvlyEnabled bool
 	}{
 		{
 			desc: "IPv6 CIDR, excludes ips empty",

@@ -45,18 +45,14 @@ import (
 
 // WatchFactory initializes and manages common kube watches
 type WatchFactory struct {
-	// Must be first member in the struct due to Golang ARM/x86 32-bit
-	// requirements with atomic accesses
-	handlerCounter uint64
-
 	iFactory         informerfactory.SharedInformerFactory
 	eipFactory       egressipinformerfactory.SharedInformerFactory
 	efFactory        egressfirewallinformerfactory.SharedInformerFactory
 	cpipcFactory     ocpcloudnetworkinformerfactory.SharedInformerFactory
 	egressQoSFactory egressqosinformerfactory.SharedInformerFactory
 	informers        map[reflect.Type]*informer
-
-	stopChan chan struct{}
+	stopChan         chan struct{}
+	handlerCounter   uint64
 }
 
 // WatchFactory implements the ObjectCacheInterface interface.

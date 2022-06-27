@@ -7,19 +7,19 @@ import "github.com/ovn-org/libovsdb/model"
 
 // NBGlobal defines an object in NB_Global table
 type NBGlobal struct {
+	SSL            *string           `ovsdb:"ssl"`
+	Options        map[string]string `ovsdb:"options"`
+	ExternalIDs    map[string]string `ovsdb:"external_ids"`
+	Name           string            `ovsdb:"name"`
 	UUID           string            `ovsdb:"_uuid"`
 	Connections    []string          `ovsdb:"connections"`
-	ExternalIDs    map[string]string `ovsdb:"external_ids"`
-	HvCfg          int               `ovsdb:"hv_cfg"`
 	HvCfgTimestamp int               `ovsdb:"hv_cfg_timestamp"`
-	Ipsec          bool              `ovsdb:"ipsec"`
-	Name           string            `ovsdb:"name"`
+	SbCfgTimestamp int               `ovsdb:"sb_cfg_timestamp"`
 	NbCfg          int               `ovsdb:"nb_cfg"`
 	NbCfgTimestamp int               `ovsdb:"nb_cfg_timestamp"`
-	Options        map[string]string `ovsdb:"options"`
 	SbCfg          int               `ovsdb:"sb_cfg"`
-	SbCfgTimestamp int               `ovsdb:"sb_cfg_timestamp"`
-	SSL            *string           `ovsdb:"ssl"`
+	HvCfg          int               `ovsdb:"hv_cfg"`
+	Ipsec          bool              `ovsdb:"ipsec"`
 }
 
 func copyNBGlobalConnections(a []string) []string {

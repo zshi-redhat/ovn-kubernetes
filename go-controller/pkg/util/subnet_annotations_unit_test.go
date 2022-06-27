@@ -179,9 +179,9 @@ func TestParseSubnetAnnotation(t *testing.T) {
 
 func TestNodeSubnetAnnotationChanged(t *testing.T) {
 	tests := []struct {
-		desc    string
 		oldNode *v1.Node
 		newNode *v1.Node
+		desc    string
 		result  bool
 	}{
 		{
@@ -247,9 +247,9 @@ func TestNodeSubnetAnnotationChanged(t *testing.T) {
 
 func TestCreateNodeHostSubnetAnnotation(t *testing.T) {
 	tests := []struct {
+		outExp          map[string]interface{}
 		desc            string
 		inpDefSubnetIps []*net.IPNet
-		outExp          map[string]interface{}
 		errExp          bool
 	}{
 		{
@@ -313,8 +313,8 @@ func TestDeleteNodeHostSubnetAnnotation(t *testing.T) {
 	testAnnotator := kube.NewNodeAnnotator(k, "")
 
 	tests := []struct {
-		desc             string
 		inpNodeAnnotator kube.Annotator
+		desc             string
 	}{
 		{
 			desc:             "function code coverage",
@@ -330,8 +330,8 @@ func TestDeleteNodeHostSubnetAnnotation(t *testing.T) {
 
 func TestParseNodeHostSubnetAnnotation(t *testing.T) {
 	tests := []struct {
-		desc    string
 		inpNode v1.Node
+		desc    string
 		errExp  bool
 	}{
 		{

@@ -32,10 +32,10 @@ type AddrInfo struct {
 	Prefixlen int    `json:"prefixlen,omitempty"`
 }
 type IpAddrReq struct {
-	IfIndex   int        `json:"ifindex,omitempty"`
 	IfName    string     `json:"ifname,omitempty"`
-	LinkIndex int        `json:"link_index,omitempty"`
 	AInfo     []AddrInfo `json:"addr_info,omitempty"`
+	IfIndex   int        `json:"ifindex,omitempty"`
+	LinkIndex int        `json:"link_index,omitempty"`
 }
 
 type SvcInfo struct {

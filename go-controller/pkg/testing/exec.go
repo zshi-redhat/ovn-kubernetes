@@ -17,16 +17,12 @@ type KCmd func(cmd string, args ...string) kexec.Cmd
 
 // FakeExec is a convenience struct that wraps testing.FakeExec
 type FakeExec struct {
-	// Activate this for a loose comparison of executed OVN commands.
-	// We will in such a case ignore order when comparing all executed commands during the run of a test case.
-	// This is important when defining test cases with multiple resources (or multiple resource watchers) of
-	// the same type and not being able to rely on a deterministic order of incomming watch events.
-	looseCompare       bool
+	unexpectedCommand  string
 	expectedCommands   []*ExpectedCmd
 	executedCommands   []string
 	mu                 sync.Mutex
+	looseCompare       bool
 	receivedUnexpected bool
-	unexpectedCommand  string
 }
 
 var _ kexec.Interface = &FakeExec{}
@@ -130,21 +126,13 @@ func (f *FakeExec) CalledMatchesExpected() bool {
 // ExpectedCmd contains properties that the testcase expects a called command
 // to have as well as the output that the fake command should return
 type ExpectedCmd struct {
-	// Cmd should be the command-line string of the executable name and all arguments it is expected to be called with
-	Cmd string
-	// LooseBatchCompare should be set if the command-line string is a batched
-	// ovn-nbctl where the ordering does not matter
+	Err               error
+	Action            func() error
+	Cmd               string
+	Output            string
+	Stderr            string
 	LooseBatchCompare bool
-	// Output is any stdout output which Cmd should produce
-	Output string
-	// Stderr is any stderr output which Cmd should produce
-	Stderr string
-	// Err is any error that should be returned for the invocation of Cmd
-	Err error
-	// Action is run when the fake command is "run"
-	Action func() error
-	// called is set to true when the command is called
-	called bool
+	called            bool
 }
 
 // compare compares an executed command and an ExpectedCommand, optionally

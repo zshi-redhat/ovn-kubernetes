@@ -33,13 +33,13 @@ import (
 
 // OvnNode is the object holder for utilities meant for node management
 type OvnNode struct {
-	name         string
+	gateway      Gateway
 	client       clientset.Interface
 	Kube         kube.Interface
 	watchFactory factory.NodeWatchFactory
-	stopChan     chan struct{}
 	recorder     record.EventRecorder
-	gateway      Gateway
+	stopChan     chan struct{}
+	name         string
 }
 
 // NewNode creates a new controller for node management
@@ -628,8 +628,8 @@ func (n *OvnNode) validateVTEPInterfaceMTU() error {
 
 type epAddressItem struct {
 	ip       string
-	port     int32
 	protocol kapi.Protocol
+	port     int32
 }
 
 //buildEndpointAddressMap builds a map of all UDP and SCTP ports in the endpoint subset along with that port's IP address

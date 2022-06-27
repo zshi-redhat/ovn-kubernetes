@@ -8,8 +8,8 @@ import "github.com/ovn-org/libovsdb/model"
 // FDB defines an object in FDB table
 type FDB struct {
 	UUID    string `ovsdb:"_uuid"`
-	DpKey   int    `ovsdb:"dp_key"`
 	MAC     string `ovsdb:"mac"`
+	DpKey   int    `ovsdb:"dp_key"`
 	PortKey int    `ovsdb:"port_key"`
 }
 

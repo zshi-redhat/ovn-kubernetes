@@ -75,8 +75,8 @@ func (t *FakeTable) getChain(chainName string) ([]string, error) {
 
 // FakeIPTables is a mock implementation of go-iptables
 type FakeIPTables struct {
-	proto  iptables.Protocol
 	tables map[string]*FakeTable
+	proto  iptables.Protocol
 }
 
 // SetFakeIPTablesHelpers populates `helpers` with FakeIPTablesHelper that can be used in unit tests

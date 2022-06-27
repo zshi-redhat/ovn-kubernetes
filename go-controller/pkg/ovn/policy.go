@@ -51,27 +51,19 @@ const (
 var NetworkPolicyNotCreated error
 
 type networkPolicy struct {
-	// RWMutex synchronizes operations on the policy.
-	// Operations that change local and peer pods take a RLock,
-	// whereas operations that affect the policy take a Lock.
-	sync.RWMutex
+	policy          *knet.NetworkPolicy
+	localPods       sync.Map
+	portGroupName   string
 	name            string
 	namespace       string
-	policy          *knet.NetworkPolicy
 	ingressPolicies []*gressPolicy
 	egressPolicies  []*gressPolicy
 	podHandlerList  []*factory.Handler
 	svcHandlerList  []*factory.Handler
 	nsHandlerList   []*factory.Handler
-
-	// localPods is a list of pods affected by this policy
-	// this is a sync map so we can handle multiple pods at once
-	// map of string -> *lpInfo
-	localPods sync.Map
-
-	portGroupName string
-	deleted       bool //deleted policy
-	created       bool
+	sync.RWMutex
+	deleted bool
+	created bool
 }
 
 func NewNetworkPolicy(policy *knet.NetworkPolicy) *networkPolicy {

@@ -51,15 +51,13 @@ func createTempFile(name string) (string, error) {
 }
 
 type managementPortTestConfig struct {
-	family   int
-	protocol iptables.Protocol
-
-	clusterCIDR string
-	serviceCIDR string
-	nodeSubnet  string
-
-	expectedManagementPortIP string
 	expectedGatewayIP        string
+	clusterCIDR              string
+	serviceCIDR              string
+	nodeSubnet               string
+	expectedManagementPortIP string
+	family                   int
+	protocol                 iptables.Protocol
 }
 
 func (mptc *managementPortTestConfig) GetNodeSubnetCIDR() *net.IPNet {

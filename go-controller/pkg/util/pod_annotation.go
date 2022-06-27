@@ -78,13 +78,12 @@ type PodRoute struct {
 
 // Internal struct used to marshal PodAnnotation to the pod annotation
 type podAnnotation struct {
-	IPs      []string   `json:"ip_addresses"`
 	MAC      string     `json:"mac_address"`
+	IP       string     `json:"ip_address,omitempty"`
+	Gateway  string     `json:"gateway_ip,omitempty"`
+	IPs      []string   `json:"ip_addresses"`
 	Gateways []string   `json:"gateway_ips,omitempty"`
 	Routes   []podRoute `json:"routes,omitempty"`
-
-	IP      string `json:"ip_address,omitempty"`
-	Gateway string `json:"gateway_ip,omitempty"`
 }
 
 // Internal struct used to marshal PodRoute to the pod annotation

@@ -4,18 +4,15 @@ import "github.com/ovn-org/ovn-kubernetes/go-controller/pkg/util"
 
 // LB is a desired or existing load_balancer configuration in OVN.
 type LB struct {
+	ExternalIDs map[string]string
 	Name        string
 	UUID        string
-	Protocol    string // one of TCP, UDP, SCTP
-	ExternalIDs map[string]string
+	Protocol    string
+	Rules       []LBRule
+	Switches    []string
+	Routers     []string
+	Groups      []string
 	Opts        LBOpts
-
-	Rules []LBRule
-
-	// the names of logical switches, routers and LB groups that this LB should be attached to
-	Switches []string
-	Routers  []string
-	Groups   []string
 }
 
 type LBOpts struct {

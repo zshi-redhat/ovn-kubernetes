@@ -34,8 +34,8 @@ func TestNewEgressDNS(t *testing.T) {
 	util.SetDNSLibOpsMockInst(mockDnsOps)
 	tests := []struct {
 		desc             string
-		errExp           bool
 		dnsOpsMockHelper []ovntest.TestifyMockHelper
+		errExp           bool
 	}{
 		{
 			desc:   "fails to read the /etc/resolv.conf file",
@@ -96,16 +96,16 @@ func TestAdd(t *testing.T) {
 	test1IPv6 := "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
 	tests := []struct {
 		desc                       string
-		errExp                     bool
 		dnsName                    string
-		configIPv4                 bool
-		configIPv6                 bool
-		testingUpdateOnQueryTime   bool
-		syncTime                   time.Duration
-		waitForSyncLoop            bool
-		dnsOpsMockHelper           []ovntest.TestifyMockHelper
 		addressSetFactoryOpsHelper []ovntest.TestifyMockHelper
 		addressSetOpsHelper        []ovntest.TestifyMockHelper
+		dnsOpsMockHelper           []ovntest.TestifyMockHelper
+		syncTime                   time.Duration
+		errExp                     bool
+		testingUpdateOnQueryTime   bool
+		waitForSyncLoop            bool
+		configIPv4                 bool
+		configIPv6                 bool
 	}{
 		{
 			desc:     "NewAddressSet returns error",
@@ -300,16 +300,16 @@ func TestDelete(t *testing.T) {
 	test1IPv6 := "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
 	tests := []struct {
 		desc                       string
-		errExp                     bool
 		dnsName                    string
-		configIPv4                 bool
-		configIPv6                 bool
-		testingUpdateOnQueryTime   bool
-		syncTime                   time.Duration
-		waitForSyncLoop            bool
-		dnsOpsMockHelper           []ovntest.TestifyMockHelper
 		addressSetFactoryOpsHelper []ovntest.TestifyMockHelper
 		addressSetOpsHelper        []ovntest.TestifyMockHelper
+		dnsOpsMockHelper           []ovntest.TestifyMockHelper
+		syncTime                   time.Duration
+		errExp                     bool
+		testingUpdateOnQueryTime   bool
+		waitForSyncLoop            bool
+		configIPv4                 bool
+		configIPv6                 bool
 	}{
 		{
 			desc:                     "EgressFirewall Delete functions",

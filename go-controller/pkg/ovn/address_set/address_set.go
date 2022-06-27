@@ -238,9 +238,9 @@ type ovnAddressSet struct {
 
 type ovnAddressSets struct {
 	nbClient libovsdbclient.Client
-	name     string
 	ipv4     *ovnAddressSet
 	ipv6     *ovnAddressSet
+	name     string
 }
 
 // ovnAddressSets implements the AddressSet interface

@@ -22,9 +22,8 @@ func NewFakeAddressSetFactory() *FakeAddressSetFactory {
 }
 
 type FakeAddressSetFactory struct {
-	sync.Mutex
-	// maps address set name to object
 	sets map[string]*fakeAddressSet
+	sync.Mutex
 }
 
 // fakeFactory implements the AddressSetFactory interface
@@ -189,22 +188,22 @@ func (f *FakeAddressSetFactory) EventuallyExpectNoAddressSet(name string) {
 type removeFunc func(string)
 
 type fakeAddressSet struct {
+	ips      map[string]net.IP
+	removeFn removeFunc
+	name     string
+	hashName string
 	sync.Mutex
-	name      string
-	hashName  string
-	ips       map[string]net.IP
 	destroyed uint32
-	removeFn  removeFunc
 }
 
 // fakeAddressSets implements the AddressSet interface
 var _ AddressSet = &fakeAddressSets{}
 
 type fakeAddressSets struct {
-	sync.Mutex
-	name string
 	ipv4 *fakeAddressSet
 	ipv6 *fakeAddressSet
+	name string
+	sync.Mutex
 }
 
 func newFakeAddressSets(name string, ips []net.IP, removeFn removeFunc) (*fakeAddressSets, error) {

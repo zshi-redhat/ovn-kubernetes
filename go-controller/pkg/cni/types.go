@@ -38,17 +38,16 @@ type KubeAPIAuth struct {
 
 // PodInterfaceInfo consists of interface info result from cni server if cni client configure's interface
 type PodInterfaceInfo struct {
+	PodUID       string `json:"pod-uid"`
+	VfNetdevName string `json:"vf-netdev-name"`
 	util.PodAnnotation
-
-	MTU                  int    `json:"mtu"`
-	RoutableMTU          int    `json:"routable-mtu"`
-	Ingress              int64  `json:"ingress"`
-	Egress               int64  `json:"egress"`
-	CheckExtIDs          bool   `json:"check-external-ids"`
-	IsDPUHostMode        bool   `json:"is-dpu-host-mode"`
-	PodUID               string `json:"pod-uid"`
-	VfNetdevName         string `json:"vf-netdev-name"`
-	EnableUDPAggregation bool   `json:"enable-udp-aggregation"`
+	Ingress              int64 `json:"ingress"`
+	Egress               int64 `json:"egress"`
+	MTU                  int   `json:"mtu"`
+	RoutableMTU          int   `json:"routable-mtu"`
+	CheckExtIDs          bool  `json:"check-external-ids"`
+	IsDPUHostMode        bool  `json:"is-dpu-host-mode"`
+	EnableUDPAggregation bool  `json:"enable-udp-aggregation"`
 }
 
 // Explicit type for CNI commands the server handles
@@ -120,28 +119,17 @@ func (response *Response) MarshalForLogging() ([]byte, error) {
 // PodRequest structure built from Request which is passed to the
 // handler function given to the Server at creation time
 type PodRequest struct {
-	// The CNI command of the operation
-	Command command
-	// kubernetes namespace name
+	timestamp    time.Time
+	ctx          context.Context
+	CNIConf      *types.NetConf
+	cancel       context.CancelFunc
+	Command      command
+	Netns        string
+	IfName       string
 	PodNamespace string
-	// kubernetes pod name
-	PodName string
-	// kubernetes pod UID
-	PodUID string
-	// kubernetes container ID
-	SandboxID string
-	// kernel network namespace path
-	Netns string
-	// Interface name to be configured
-	IfName string
-	// CNI conf obtained from stdin conf
-	CNIConf *types.NetConf
-	// Timestamp when the request was started
-	timestamp time.Time
-	// ctx is a context tracking this request's lifetime
-	ctx context.Context
-	// cancel should be called to cancel this request
-	cancel context.CancelFunc
+	PodName      string
+	PodUID       string
+	SandboxID    string
 }
 
 type cniRequestFunc func(request *PodRequest, podLister corev1listers.PodLister, useOVSExternalIDs bool, kclient kubernetes.Interface, kubeAuth *KubeAPIAuth) ([]byte, error)
@@ -149,11 +137,11 @@ type cniRequestFunc func(request *PodRequest, podLister corev1listers.PodLister,
 // Server object that listens for JSON-marshaled Request objects
 // on a private root-only Unix domain socket.
 type Server struct {
+	kclient     kubernetes.Interface
+	podLister   corev1listers.PodLister
+	kubeAuth    *KubeAPIAuth
+	requestFunc cniRequestFunc
+	rundir      string
 	http.Server
-	requestFunc       cniRequestFunc
-	rundir            string
 	useOVSExternalIDs int32
-	kclient           kubernetes.Interface
-	podLister         corev1listers.PodLister
-	kubeAuth          *KubeAPIAuth
 }

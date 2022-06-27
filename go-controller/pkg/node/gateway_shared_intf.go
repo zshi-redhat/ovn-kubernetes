@@ -62,18 +62,17 @@ func newNodePortWatcherIptables() *nodePortWatcherIptables {
 // nodePortWatcher manages OpenFlow and iptables rules
 // to ensure that services using NodePorts are accessible
 type nodePortWatcher struct {
-	dpuMode     bool
-	gatewayIPv4 string
-	gatewayIPv6 string
-	ofportPhys  string
-	ofportPatch string
-	gwBridge    string
-	// Map of service name to programmed iptables/OF rules
+	watchFactory    factory.NodeWatchFactory
 	serviceInfo     map[ktypes.NamespacedName]*serviceConfig
-	serviceInfoLock sync.Mutex
 	ofm             *openflowManager
 	nodeIPManager   *addressManager
-	watchFactory    factory.NodeWatchFactory
+	gatewayIPv4     string
+	gwBridge        string
+	gatewayIPv6     string
+	ofportPhys      string
+	ofportPatch     string
+	serviceInfoLock sync.Mutex
+	dpuMode         bool
 }
 
 type serviceConfig struct {

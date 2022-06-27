@@ -100,12 +100,12 @@ func TestSyncServices(t *testing.T) {
 	}
 
 	tests := []struct {
-		name        string
 		slice       *discovery.EndpointSlice
 		service     *v1.Service
+		name        string
+		gatewayMode string
 		initialDb   []libovsdbtest.TestData
 		expectedDb  []libovsdbtest.TestData
-		gatewayMode string
 	}{
 
 		{

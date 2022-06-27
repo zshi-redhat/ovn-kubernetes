@@ -14,30 +14,20 @@ import (
 )
 
 type EgressDNS struct {
-	// Protects pdMap/namespaces operations
-	lock sync.Mutex
-	// holds DNS entries globally
-	dns *util.DNS
-	// this map holds dnsNames to the dnsEntries
-	dnsEntries map[string]*dnsEntry
-	// allows for the creation of addresssets
 	addressSetFactory addressset.AddressSetFactory
-
-	// Report change when Add operation is done
-	added          chan struct{}
-	deleted        chan string
-	stopChan       chan struct{}
-	controllerStop <-chan struct{}
+	stopChan          chan struct{}
+	dns               *util.DNS
+	dnsEntries        map[string]*dnsEntry
+	added             chan struct{}
+	deleted           chan string
+	controllerStop    <-chan struct{}
+	lock              sync.Mutex
 }
 
 type dnsEntry struct {
-	// this map holds all the namespaces that a dnsName appears in
-	namespaces map[string]struct{}
-	// the current IP addresses the dnsName resolves to
-	// NOTE: used for testing
-	dnsResolves []net.IP
-	// the addressSet that contains the current IPs
 	dnsAddressSet addressset.AddressSet
+	namespaces    map[string]struct{}
+	dnsResolves   []net.IP
 }
 
 func NewEgressDNS(addressSetFactory addressset.AddressSetFactory, controllerStop <-chan struct{}) (*EgressDNS, error) {

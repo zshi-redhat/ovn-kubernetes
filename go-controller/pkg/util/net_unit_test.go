@@ -74,9 +74,9 @@ const (
 
 func TestExtractPortAddresses(t *testing.T) {
 	tests := []struct {
-		desc       string
-		lsp        *nbdb.LogicalSwitchPort
 		errMatch   error
+		lsp        *nbdb.LogicalSwitchPort
+		desc       string
 		isNotFound bool
 		hasNoIP    bool
 	}{
@@ -160,11 +160,11 @@ func TestGetOVSPortMACAddress(t *testing.T) {
 	runner = &execHelper{exec: mockKexecIface}
 
 	tests := []struct {
+		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
+		onRetArgsKexecIface     *ovntest.TestifyMockHelper
 		desc                    string
 		input                   string
 		errExpected             bool
-		onRetArgsExecUtilsIface *ovntest.TestifyMockHelper
-		onRetArgsKexecIface     *ovntest.TestifyMockHelper
 	}{
 		// NOTE: May need a test to validate (e.g; zero length string ) portName parameter that is passed to function
 		{
@@ -207,8 +207,8 @@ func TestGetOVSPortMACAddress(t *testing.T) {
 func TestIPFamilyName(t *testing.T) {
 	tests := []struct {
 		desc   string
-		input  bool
 		expOut string
+		input  bool
 	}{
 		{
 			desc:   "verify bool value `true` maps to IPv6",
@@ -233,9 +233,9 @@ func TestIPFamilyName(t *testing.T) {
 func TestMatchIPFamily(t *testing.T) {
 	tests := []struct {
 		desc      string
-		inpIsIPv6 bool // true matches with IPv6 and false with IPv4
-		inpIPs    []string
 		expected  string
+		inpIPs    []string
+		inpIsIPv6 bool
 	}{
 		{
 			desc:      "negative: attempt to get IPv6 from an empty IP list",
@@ -284,9 +284,9 @@ func TestMatchIPFamily(t *testing.T) {
 func TestMatchIPNetFamily(t *testing.T) {
 	tests := []struct {
 		desc       string
-		inpIsIPv6  bool // true matches with IPv6 and false with IPv4
-		inpSubnets []string
 		expected   string
+		inpSubnets []string
+		inpIsIPv6  bool
 	}{
 		{
 			desc:       "negative: attempt to get IPv6 from an empty IP list",
@@ -336,8 +336,8 @@ func TestJoinHostPortInt32(t *testing.T) {
 	tests := []struct {
 		desc    string
 		inpHost string
-		inpPort int32
 		outExp  string
+		inpPort int32
 	}{
 		{
 			desc:    "empty string for host name and a negative port number",
@@ -402,9 +402,9 @@ func TestIPAddrToHWAddr(t *testing.T) {
 func TestJoinIPs(t *testing.T) {
 	tests := []struct {
 		desc         string
-		inpIPList    []net.IP
 		inpSeparator string
 		outExp       string
+		inpIPList    []net.IP
 	}{
 		{
 			desc:         "an empty net.IPNet list with ',' separator",
@@ -436,9 +436,9 @@ func TestJoinIPs(t *testing.T) {
 func TestJoinIPNets(t *testing.T) {
 	tests := []struct {
 		desc         string
-		inpIPNetList []*net.IPNet
 		inpSeparator string
 		outExp       string
+		inpIPNetList []*net.IPNet
 	}{
 		{
 			desc:         "an empty net.IPNet list with ',' separator",
@@ -470,9 +470,9 @@ func TestJoinIPNets(t *testing.T) {
 func TestJoinIPNetIPs(t *testing.T) {
 	tests := []struct {
 		desc         string
-		inpIPNetList []*net.IPNet
 		inpSeparator string
 		outExp       string
+		inpIPNetList []*net.IPNet
 	}{
 		{
 			desc:         "an empty net.IPNet list with ',' separator",

@@ -7,15 +7,15 @@ import "github.com/ovn-org/libovsdb/model"
 
 // Chassis defines an object in Chassis table
 type Chassis struct {
-	UUID                string            `ovsdb:"_uuid"`
-	Encaps              []string          `ovsdb:"encaps"`
+	OtherConfig         map[string]string `ovsdb:"other_config"`
 	ExternalIDs         map[string]string `ovsdb:"external_ids"`
 	Hostname            string            `ovsdb:"hostname"`
 	Name                string            `ovsdb:"name"`
-	NbCfg               int               `ovsdb:"nb_cfg"`
-	OtherConfig         map[string]string `ovsdb:"other_config"`
+	UUID                string            `ovsdb:"_uuid"`
+	Encaps              []string          `ovsdb:"encaps"`
 	TransportZones      []string          `ovsdb:"transport_zones"`
 	VtepLogicalSwitches []string          `ovsdb:"vtep_logical_switches"`
+	NbCfg               int               `ovsdb:"nb_cfg"`
 }
 
 func copyChassisEncaps(a []string) []string {

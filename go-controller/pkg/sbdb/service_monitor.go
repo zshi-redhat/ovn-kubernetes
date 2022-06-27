@@ -20,16 +20,16 @@ var (
 
 // ServiceMonitor defines an object in Service_Monitor table
 type ServiceMonitor struct {
-	UUID        string                  `ovsdb:"_uuid"`
-	ExternalIDs map[string]string       `ovsdb:"external_ids"`
-	IP          string                  `ovsdb:"ip"`
-	LogicalPort string                  `ovsdb:"logical_port"`
-	Options     map[string]string       `ovsdb:"options"`
-	Port        int                     `ovsdb:"port"`
 	Protocol    *ServiceMonitorProtocol `ovsdb:"protocol"`
+	ExternalIDs map[string]string       `ovsdb:"external_ids"`
+	Status      *ServiceMonitorStatus   `ovsdb:"status"`
+	Options     map[string]string       `ovsdb:"options"`
+	IP          string                  `ovsdb:"ip"`
+	UUID        string                  `ovsdb:"_uuid"`
 	SrcIP       string                  `ovsdb:"src_ip"`
 	SrcMAC      string                  `ovsdb:"src_mac"`
-	Status      *ServiceMonitorStatus   `ovsdb:"status"`
+	LogicalPort string                  `ovsdb:"logical_port"`
+	Port        int                     `ovsdb:"port"`
 }
 
 func copyServiceMonitorExternalIDs(a map[string]string) map[string]string {

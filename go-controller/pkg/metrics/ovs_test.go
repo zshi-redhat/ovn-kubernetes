@@ -11,14 +11,14 @@ import (
 )
 
 type clientOutput struct {
+	err    error
 	stdout string
 	stderr string
-	err    error
 }
 
 type fakeOVSClient struct {
-	dataIndex int
 	data      []clientOutput
+	dataIndex int
 }
 
 func NewFakeOVSClient(data []clientOutput) fakeOVSClient {

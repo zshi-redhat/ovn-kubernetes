@@ -14,9 +14,9 @@ import (
 )
 
 type mockRes struct {
+	err    error
 	res    string
 	stderr string
-	err    error
 	called bool
 }
 
@@ -531,12 +531,12 @@ func TestEnsureElectionTimeout(t *testing.T) {
 		DbName: "OVN_Northbound",
 	}
 	tests := []struct {
-		desc         string
 		mockCalls    map[string]*mockRes
-		timeout      int
+		desc         string
 		role         string
 		currentTimer string
 		errorString  string
+		timeout      int
 	}{
 		{
 			desc: "Test error: Unable to get cluster status",
@@ -687,12 +687,12 @@ func TestResetRaftDB(t *testing.T) {
 		AppCtl: mock,
 	}
 	tests := []struct {
+		mockCalls    map[string]*mockRes
 		desc         string
 		dbAlias      string
 		dbName       string
-		createDbFile bool
-		mockCalls    map[string]*mockRes
 		errorString  string
+		createDbFile bool
 	}{
 		{
 			desc:        "Failed to back up the db to backupFile",

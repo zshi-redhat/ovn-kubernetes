@@ -7,11 +7,11 @@ import "github.com/ovn-org/libovsdb/model"
 
 // GatewayChassis defines an object in Gateway_Chassis table
 type GatewayChassis struct {
+	ExternalIDs map[string]string `ovsdb:"external_ids"`
+	Options     map[string]string `ovsdb:"options"`
 	UUID        string            `ovsdb:"_uuid"`
 	ChassisName string            `ovsdb:"chassis_name"`
-	ExternalIDs map[string]string `ovsdb:"external_ids"`
 	Name        string            `ovsdb:"name"`
-	Options     map[string]string `ovsdb:"options"`
 	Priority    int               `ovsdb:"priority"`
 }
 

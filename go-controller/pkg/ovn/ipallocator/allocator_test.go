@@ -27,10 +27,10 @@ func TestAllocate(t *testing.T) {
 	testCases := []struct {
 		name             string
 		cidr             string
-		free             int
 		released         string
-		outOfRange       []string
 		alreadyAllocated string
+		outOfRange       []string
+		free             int
 	}{
 		{
 			name:     "IPv4",

@@ -18,15 +18,15 @@ var (
 
 // BFD defines an object in BFD table
 type BFD struct {
-	UUID        string            `ovsdb:"_uuid"`
-	DetectMult  *int              `ovsdb:"detect_mult"`
-	DstIP       string            `ovsdb:"dst_ip"`
-	ExternalIDs map[string]string `ovsdb:"external_ids"`
-	LogicalPort string            `ovsdb:"logical_port"`
-	MinRx       *int              `ovsdb:"min_rx"`
 	MinTx       *int              `ovsdb:"min_tx"`
-	Options     map[string]string `ovsdb:"options"`
+	DetectMult  *int              `ovsdb:"detect_mult"`
 	Status      *BFDStatus        `ovsdb:"status"`
+	ExternalIDs map[string]string `ovsdb:"external_ids"`
+	MinRx       *int              `ovsdb:"min_rx"`
+	Options     map[string]string `ovsdb:"options"`
+	LogicalPort string            `ovsdb:"logical_port"`
+	UUID        string            `ovsdb:"_uuid"`
+	DstIP       string            `ovsdb:"dst_ip"`
 }
 
 func copyBFDDetectMult(a *int) *int {

@@ -47,11 +47,11 @@ func TestOvsExec(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
-		desc                string
 		expectedErr         error
+		runnerInstance      kexec.Interface
 		onRetArgsKexecIface *ovntest.TestifyMockHelper
 		onRetArgsCmdList    *ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
+		desc                string
 	}{
 		{
 			desc:           "Test codepath when runner is nil and returns error",
@@ -103,11 +103,11 @@ func TestOvsCreate(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
-		desc                string
 		expectedErr         error
+		runnerInstance      kexec.Interface
 		onRetArgsKexecIface *ovntest.TestifyMockHelper
 		onRetArgsCmdList    *ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
+		desc                string
 	}{
 		{
 			desc:                "Positive test codepath for ovsCreate",
@@ -143,11 +143,11 @@ func TestOvsDestroy(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
-		desc                string
 		expectedErr         error
+		runnerInstance      kexec.Interface
 		onRetArgsKexecIface *ovntest.TestifyMockHelper
 		onRetArgsCmdList    *ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
+		desc                string
 	}{
 		{
 			desc:                "Positive test codepath for ovsDestroy",
@@ -183,11 +183,11 @@ func TestOvsSet(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
-		desc                string
 		expectedErr         error
+		runnerInstance      kexec.Interface
 		onRetArgsKexecIface *ovntest.TestifyMockHelper
 		onRetArgsCmdList    *ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
+		desc                string
 	}{
 		{
 			desc:                "Positive test codepath for ovsSet",
@@ -223,11 +223,11 @@ func TestOvsFind(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
-		desc                string
 		expectedErr         error
+		runnerInstance      kexec.Interface
 		onRetArgsKexecIface *ovntest.TestifyMockHelper
 		onRetArgsCmdList    *ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
+		desc                string
 	}{
 		{
 			desc:                "Test codepath when ovsExec returns an error",
@@ -277,11 +277,11 @@ func TestOvsClear(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
-		desc                string
 		expectedErr         error
+		runnerInstance      kexec.Interface
 		onRetArgsKexecIface *ovntest.TestifyMockHelper
 		onRetArgsCmdList    *ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
+		desc                string
 	}{
 		{
 			desc:                "Positive test codepath for ovsClear",
@@ -317,11 +317,11 @@ func TestOfctlExec(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
-		desc                string
 		expectedErr         error
-		onRetArgsKexecIface *ovntest.TestifyMockHelper
-		onRetArgsCmdList    []ovntest.TestifyMockHelper
 		runnerInstance      kexec.Interface
+		onRetArgsKexecIface *ovntest.TestifyMockHelper
+		desc                string
+		onRetArgsCmdList    []ovntest.TestifyMockHelper
 	}{
 		{
 			desc:                "Positive test codepath for ofctlExec",

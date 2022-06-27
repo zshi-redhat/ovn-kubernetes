@@ -17,11 +17,11 @@ func TestClearPodBandwidth(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
+		runnerInstance      kexec.Interface
 		desc                string
-		expectedErr         bool
 		onRetArgsKexecIface []ovntest.TestifyMockHelper
 		onRetArgsCmdList    []ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
+		expectedErr         bool
 	}{
 		{
 			desc:        "Test error code path when ovsFind attempts to retrieve interfaces",
@@ -124,12 +124,12 @@ func TestSetPodBandwidth(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
+		runnerInstance      kexec.Interface
 		desc                string
-		expectedErr         bool
 		onRetArgsKexecIface []ovntest.TestifyMockHelper
 		onRetArgsCmdList    []ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
 		egressBPS           int64
+		expectedErr         bool
 	}{
 		{
 			desc:        "Test code path when both ingressBPS is greater than zero and ovsCreate returns an error",
@@ -251,13 +251,13 @@ func TestGetIngressPodBandwidth(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
+		runnerInstance      kexec.Interface
 		desc                string
-		expectedErr         bool
-		expectedNotFound    bool
 		onRetArgsKexecIface []ovntest.TestifyMockHelper
 		onRetArgsCmdList    []ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
 		bps                 int64
+		expectedErr         bool
+		expectedNotFound    bool
 	}{
 		{
 			desc: "Positive test code path when ingressBPS is correctly set",
@@ -384,13 +384,13 @@ func TestGetEgressPodBandwidth(t *testing.T) {
 	mockCmd := new(mock_k8s_io_utils_exec.Cmd)
 
 	tests := []struct {
+		runnerInstance      kexec.Interface
 		desc                string
-		expectedErr         bool
-		expectedNotFound    bool
 		onRetArgsKexecIface []ovntest.TestifyMockHelper
 		onRetArgsCmdList    []ovntest.TestifyMockHelper
-		runnerInstance      kexec.Interface
 		bps                 int64
+		expectedErr         bool
+		expectedNotFound    bool
 	}{
 		{
 			desc: "Positive test code path when egressBPS is correctly set",

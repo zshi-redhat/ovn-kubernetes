@@ -43,14 +43,13 @@ const (
 )
 
 type metricDetails struct {
-	srcName       string
-	aggregateFrom []string
-	help          string
 	metric        prometheus.Gauge
+	srcName       string
+	help          string
+	aggregateFrom []string
 }
 
 type stopwatchMetricDetails struct {
-	srcName string
 	metrics struct {
 		totalSamples   prometheus.Gauge
 		max            prometheus.Gauge
@@ -59,6 +58,7 @@ type stopwatchMetricDetails struct {
 		shortTermAvg   prometheus.Gauge
 		longTermAvg    prometheus.Gauge
 	}
+	srcName string
 }
 
 type stopwatchStatistics struct {

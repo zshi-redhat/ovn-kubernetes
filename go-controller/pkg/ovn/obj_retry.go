@@ -51,22 +51,14 @@ type retryObjEntry struct {
 }
 
 type retryObjs struct {
-	retryMutex sync.Mutex
-	// cache to hold object needs retry to successfully complete processing
-	entries map[string]*retryObjEntry
-	// resource type for these objects
-	oType reflect.Type
-	// channel to indicate we need to retry objs immediately
-	retryChan chan struct{}
-	// namespace filter fed to the handler for this resource type
-	namespaceForFilteredHandler string
-	// label selector fed to the handler for this resource type
+	extraParameters                 interface{}
+	oType                           reflect.Type
 	labelSelectorForFilteredHandler labels.Selector
-	// sync function for the handler
-	syncFunc func([]interface{}) error
-	// extra parameters needed by specific types, for now
-	// in use by network policy dynamic handlers
-	extraParameters interface{}
+	syncFunc                        func([]interface{}) error
+	retryChan                       chan struct{}
+	entries                         map[string]*retryObjEntry
+	namespaceForFilteredHandler     string
+	retryMutex                      sync.Mutex
 }
 
 // NewRetryObjs returns a new retryObjs instance, packed with the desired input parameters.

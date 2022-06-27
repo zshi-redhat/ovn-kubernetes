@@ -9,8 +9,8 @@ import (
 )
 
 type startupWaiter struct {
-	tasks []*waitTask
 	wg    *sync.WaitGroup
+	tasks []*waitTask
 }
 
 type waitFunc func() (bool, error)

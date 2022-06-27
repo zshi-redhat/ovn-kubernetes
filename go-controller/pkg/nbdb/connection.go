@@ -7,14 +7,14 @@ import "github.com/ovn-org/libovsdb/model"
 
 // Connection defines an object in Connection table
 type Connection struct {
-	UUID            string            `ovsdb:"_uuid"`
+	Status          map[string]string `ovsdb:"status"`
 	ExternalIDs     map[string]string `ovsdb:"external_ids"`
 	InactivityProbe *int              `ovsdb:"inactivity_probe"`
-	IsConnected     bool              `ovsdb:"is_connected"`
 	MaxBackoff      *int              `ovsdb:"max_backoff"`
 	OtherConfig     map[string]string `ovsdb:"other_config"`
-	Status          map[string]string `ovsdb:"status"`
+	UUID            string            `ovsdb:"_uuid"`
 	Target          string            `ovsdb:"target"`
+	IsConnected     bool              `ovsdb:"is_connected"`
 }
 
 func copyConnectionExternalIDs(a map[string]string) map[string]string {

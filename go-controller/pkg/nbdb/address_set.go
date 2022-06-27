@@ -7,10 +7,10 @@ import "github.com/ovn-org/libovsdb/model"
 
 // AddressSet defines an object in Address_Set table
 type AddressSet struct {
-	UUID        string            `ovsdb:"_uuid"`
-	Addresses   []string          `ovsdb:"addresses"`
 	ExternalIDs map[string]string `ovsdb:"external_ids"`
+	UUID        string            `ovsdb:"_uuid"`
 	Name        string            `ovsdb:"name"`
+	Addresses   []string          `ovsdb:"addresses"`
 }
 
 func copyAddressSetAddresses(a []string) []string {

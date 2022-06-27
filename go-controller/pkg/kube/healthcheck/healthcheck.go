@@ -108,13 +108,12 @@ func (stdHTTPServerFactory) New(addr string, handler http.Handler) HTTPServer {
 var _ HTTPServerFactory = stdHTTPServerFactory{}
 
 type server struct {
-	hostname    string
-	recorder    record.EventRecorder // can be nil
+	recorder    record.EventRecorder
 	listener    Listener
 	httpFactory HTTPServerFactory
-
-	lock     sync.RWMutex
-	services map[types.NamespacedName]*hcInstance
+	services    map[types.NamespacedName]*hcInstance
+	hostname    string
+	lock        sync.RWMutex
 }
 
 func (hcs *server) SyncServices(newServices map[types.NamespacedName]uint16) error {
@@ -176,15 +175,15 @@ func (hcs *server) SyncServices(newServices map[types.NamespacedName]uint16) err
 }
 
 type hcInstance struct {
-	port      uint16
 	listener  net.Listener
 	server    HTTPServer
-	endpoints int // number of local endpoints for a service
+	endpoints int
+	port      uint16
 }
 
 type hcHandler struct {
-	name types.NamespacedName
 	hcs  *server
+	name types.NamespacedName
 }
 
 var _ http.Handler = hcHandler{}

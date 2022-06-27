@@ -19,13 +19,12 @@ import (
 )
 
 type addressManager struct {
-	nodeName       string
 	watchFactory   factory.NodeWatchFactory
-	addresses      sets.String
 	nodeAnnotator  kube.Annotator
+	addresses      sets.String
 	mgmtPortConfig *managementPortConfig
-
-	OnChanged func()
+	OnChanged      func()
+	nodeName       string
 	sync.Mutex
 }
 

@@ -31,28 +31,23 @@ const (
 )
 
 type flowCacheEntry struct {
-	flows []string
-	// special table 20 flow if it has been learned from the switch
 	learnedFlow string
-	// ignore learn on next flow sync for this entry
+	flows       []string
 	ignoreLearn bool
 }
 
 // NodeController is the node hybrid overlay controller
 type NodeController struct {
+	nodeLister  listers.NodeLister
+	flowCache   map[string]*flowCacheEntry
+	flowChan    chan struct{}
 	nodeName    string
-	initialized bool
+	gwLRPIP     net.IP
 	drMAC       net.HardwareAddr
 	drIP        net.IP
-	gwLRPIP     net.IP
+	flowMutex   sync.Mutex
 	vxlanPort   uint16
-	// contains a map of pods to corresponding tunnels
-	flowCache map[string]*flowCacheEntry
-	flowMutex sync.Mutex
-	// channel to indicate we need to update flows immediately
-	flowChan chan struct{}
-
-	nodeLister listers.NodeLister
+	initialized bool
 }
 
 // newNodeController returns a node handler that listens for node events

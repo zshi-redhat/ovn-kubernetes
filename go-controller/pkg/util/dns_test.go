@@ -20,8 +20,8 @@ func TestNewDNS(t *testing.T) {
 	SetDNSLibOpsMockInst(mockDNSOps)
 	tests := []struct {
 		desc             string
-		errExp           bool
 		dnsOpsMockHelper []ovntest.TestifyMockHelper
+		errExp           bool
 	}{
 		{
 			desc:   "fails to read config file ",
@@ -68,10 +68,10 @@ func TestGetIPsAndMinTTL(t *testing.T) {
 	SetDNSLibOpsMockInst(mockDNSOps)
 	tests := []struct {
 		desc             string
+		dnsOpsMockHelper []ovntest.TestifyMockHelper
 		errExp           bool
 		ipv4Mode         bool
 		ipv6Mode         bool
-		dnsOpsMockHelper []ovntest.TestifyMockHelper
 	}{
 		{
 			desc:     "call to Exchange fails IPv4 only",
@@ -233,8 +233,8 @@ func TestAdd(t *testing.T) {
 
 	tests := []struct {
 		desc             string
-		errExp           bool
 		dnsOpsMockHelper []ovntest.TestifyMockHelper
+		errExp           bool
 	}{
 		{
 			desc:   "Add fails",

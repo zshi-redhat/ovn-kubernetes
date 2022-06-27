@@ -73,33 +73,33 @@ const (
 )
 
 type L3GatewayConfig struct {
+	VLANID              *uint
 	Mode                config.GatewayMode
 	ChassisID           string
 	InterfaceID         string
-	MACAddress          net.HardwareAddr
-	IPAddresses         []*net.IPNet
 	EgressGWInterfaceID string
+	MACAddress          net.HardwareAddr
 	EgressGWMACAddress  net.HardwareAddr
 	EgressGWIPAddresses []*net.IPNet
 	NextHops            []net.IP
+	IPAddresses         []*net.IPNet
 	NodePortEnable      bool
-	VLANID              *uint
 }
 
 type l3GatewayConfigJSON struct {
 	Mode                config.GatewayMode `json:"mode"`
 	InterfaceID         string             `json:"interface-id,omitempty"`
 	MACAddress          string             `json:"mac-address,omitempty"`
-	IPAddresses         []string           `json:"ip-addresses,omitempty"`
+	NodePortEnable      string             `json:"node-port-enable,omitempty"`
 	IPAddress           string             `json:"ip-address,omitempty"`
 	EgressGWInterfaceID string             `json:"exgw-interface-id,omitempty"`
 	EgressGWMACAddress  string             `json:"exgw-mac-address,omitempty"`
-	EgressGWIPAddresses []string           `json:"exgw-ip-addresses,omitempty"`
-	EgressGWIPAddress   string             `json:"exgw-ip-address,omitempty"`
-	NextHops            []string           `json:"next-hops,omitempty"`
 	NextHop             string             `json:"next-hop,omitempty"`
-	NodePortEnable      string             `json:"node-port-enable,omitempty"`
+	EgressGWIPAddress   string             `json:"exgw-ip-address,omitempty"`
 	VLANID              string             `json:"vlan-id,omitempty"`
+	NextHops            []string           `json:"next-hops,omitempty"`
+	EgressGWIPAddresses []string           `json:"exgw-ip-addresses,omitempty"`
+	IPAddresses         []string           `json:"ip-addresses,omitempty"`
 }
 
 func (cfg *L3GatewayConfig) MarshalJSON() ([]byte, error) {
@@ -365,8 +365,8 @@ type nodeEgressIPConfiguration struct {
 }
 
 type ParsedIFAddr struct {
-	IP  net.IP
 	Net *net.IPNet
+	IP  net.IP
 }
 
 type ParsedNodeEgressIPConfiguration struct {

@@ -7,22 +7,22 @@ import "github.com/ovn-org/libovsdb/model"
 
 // LogicalSwitchPort defines an object in Logical_Switch_Port table
 type LogicalSwitchPort struct {
-	UUID             string            `ovsdb:"_uuid"`
-	Addresses        []string          `ovsdb:"addresses"`
+	TagRequest       *int              `ovsdb:"tag_request"`
+	Tag              *int              `ovsdb:"tag"`
 	Dhcpv4Options    *string           `ovsdb:"dhcpv4_options"`
 	Dhcpv6Options    *string           `ovsdb:"dhcpv6_options"`
 	DynamicAddresses *string           `ovsdb:"dynamic_addresses"`
 	Enabled          *bool             `ovsdb:"enabled"`
 	ExternalIDs      map[string]string `ovsdb:"external_ids"`
 	HaChassisGroup   *string           `ovsdb:"ha_chassis_group"`
-	Name             string            `ovsdb:"name"`
+	Up               *bool             `ovsdb:"up"`
 	Options          map[string]string `ovsdb:"options"`
 	ParentName       *string           `ovsdb:"parent_name"`
-	PortSecurity     []string          `ovsdb:"port_security"`
-	Tag              *int              `ovsdb:"tag"`
-	TagRequest       *int              `ovsdb:"tag_request"`
+	Name             string            `ovsdb:"name"`
 	Type             string            `ovsdb:"type"`
-	Up               *bool             `ovsdb:"up"`
+	UUID             string            `ovsdb:"_uuid"`
+	PortSecurity     []string          `ovsdb:"port_security"`
+	Addresses        []string          `ovsdb:"addresses"`
 }
 
 func copyLogicalSwitchPortAddresses(a []string) []string {

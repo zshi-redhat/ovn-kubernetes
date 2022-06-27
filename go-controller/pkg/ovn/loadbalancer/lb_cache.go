@@ -36,22 +36,20 @@ func GetLBCache(nbClient libovsdbclient.Client) (*LBCache, error) {
 // LBCache caches the state of load balancers in ovn.
 // It is used to prevent unnecessary accesses to the database
 type LBCache struct {
-	sync.Mutex
-
 	existing map[string]*CachedLB
+	sync.Mutex
 }
 
 // we don't need to store / populate all information, just a subset
 type CachedLB struct {
+	Routers     sets.String
+	Groups      sets.String
+	ExternalIDs map[string]string
+	VIPs        sets.String
+	Switches    sets.String
+	UUID        string
 	Name        string
 	Protocol    string
-	UUID        string
-	ExternalIDs map[string]string
-	VIPs        sets.String // don't care about backend IPs, just the vips
-
-	Switches sets.String
-	Routers  sets.String
-	Groups   sets.String
 }
 
 // update the database with any existing LBs, along with any

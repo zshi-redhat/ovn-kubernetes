@@ -299,13 +299,13 @@ func getMaxFrameLength() int {
 type bridgeConfiguration struct {
 	bridgeName  string
 	uplinkName  string
-	ips         []*net.IPNet
+	ofPortHost  string
 	interfaceID string
-	macAddress  net.HardwareAddr
 	patchPort   string
 	ofPortPatch string
 	ofPortPhys  string
-	ofPortHost  string
+	macAddress  net.HardwareAddr
+	ips         []*net.IPNet
 }
 
 func bridgeForInterface(intfName, nodeName, physicalNetworkName string, gwIPs []*net.IPNet) (*bridgeConfiguration, error) {

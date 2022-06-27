@@ -705,9 +705,9 @@ type OVNDBServerStatus struct {
 // don't want our callers to worry about all this and we want them to see the
 // Index as an integer and hence we use an exported OVNDBServerStatus for that
 type dbRow struct {
+	Index     interface{} `json:"index"`
 	Connected bool        `json:"connected"`
 	Leader    bool        `json:"leader"`
-	Index     interface{} `json:"index"`
 }
 
 type queryResult struct {

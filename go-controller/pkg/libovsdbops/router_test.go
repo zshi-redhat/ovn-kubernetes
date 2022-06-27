@@ -140,10 +140,10 @@ func TestDeleteNATsFromRouter(t *testing.T) {
 
 	tests := []struct {
 		desc         string
-		expectErr    bool
 		routerName   string
-		nats         []*nbdb.NAT
 		expectedNbdb libovsdbtest.TestSetup
+		nats         []*nbdb.NAT
+		expectErr    bool
 	}{
 		{
 			desc:         "no router",

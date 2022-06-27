@@ -25,12 +25,11 @@ import (
 // and generates a Kubernetes NeedPods events with the Service
 // associated to the VIP
 type unidlingController struct {
-	eventQueue    chan sbdb.ControllerEvent
-	eventRecorder record.EventRecorder
-	// Map of load balancers to service namespace
+	eventRecorder        record.EventRecorder
+	sbClient             libovsdbclient.Client
+	eventQueue           chan sbdb.ControllerEvent
 	serviceVIPToName     map[ServiceVIPKey]types.NamespacedName
 	serviceVIPToNameLock sync.Mutex
-	sbClient             libovsdbclient.Client
 }
 
 // NewController creates a new unidling controller

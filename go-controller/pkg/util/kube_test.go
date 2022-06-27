@@ -273,10 +273,10 @@ func TestServiceTypeHasNodePort(t *testing.T) {
 
 func TestGetNodePrimaryIP(t *testing.T) {
 	tests := []struct {
-		desc   string
 		inp    v1.Node
-		expErr bool
+		desc   string
 		expOut string
+		expErr bool
 	}{
 		{
 			desc: "error: node has neither external nor internal IP",

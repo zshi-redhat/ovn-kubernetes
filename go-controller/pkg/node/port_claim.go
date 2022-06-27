@@ -30,10 +30,10 @@ type portManager interface {
 
 type localPortManager struct {
 	recorder          record.EventRecorder
-	activeSocketsLock sync.Mutex
+	portOpener        utilnet.PortOpener
 	localAddrSet      map[string]net.IPNet
 	portsMap          map[utilnet.LocalPort]utilnet.Closeable
-	portOpener        utilnet.PortOpener
+	activeSocketsLock sync.Mutex
 }
 
 func (p *localPortManager) open(desc string, ip string, port int32, protocol kapi.Protocol, svc *kapi.Service) error {

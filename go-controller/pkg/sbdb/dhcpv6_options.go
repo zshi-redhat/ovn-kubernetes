@@ -18,9 +18,9 @@ var (
 // DHCPv6Options defines an object in DHCPv6_Options table
 type DHCPv6Options struct {
 	UUID string            `ovsdb:"_uuid"`
-	Code int               `ovsdb:"code"`
 	Name string            `ovsdb:"name"`
 	Type DHCPv6OptionsType `ovsdb:"type"`
+	Code int               `ovsdb:"code"`
 }
 
 func (a *DHCPv6Options) DeepCopyInto(b *DHCPv6Options) {

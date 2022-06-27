@@ -103,9 +103,9 @@ func TestEnsureDefaultCOPP(t *testing.T) {
 
 	tests := []struct {
 		desc         string
-		expectErr    bool
 		initialNbdb  libovsdbtest.TestSetup
 		expectedNbdb libovsdbtest.TestSetup
+		expectErr    bool
 	}{
 		{
 			desc:      "no existing COPP",

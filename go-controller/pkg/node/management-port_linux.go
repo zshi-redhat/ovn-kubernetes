@@ -30,12 +30,11 @@ type managementPortIPFamilyConfig struct {
 }
 
 type managementPortConfig struct {
-	ifName    string
 	link      netlink.Link
+	ipv4      *managementPortIPFamilyConfig
+	ipv6      *managementPortIPFamilyConfig
+	ifName    string
 	routerMAC net.HardwareAddr
-
-	ipv4 *managementPortIPFamilyConfig
-	ipv6 *managementPortIPFamilyConfig
 }
 
 func newManagementPortIPFamilyConfig(hostSubnet *net.IPNet, isIPv6 bool) (*managementPortIPFamilyConfig, error) {

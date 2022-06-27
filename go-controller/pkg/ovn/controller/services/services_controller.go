@@ -106,51 +106,22 @@ func NewController(client clientset.Interface,
 
 // Controller manages selector-based service endpoints.
 type Controller struct {
-	client clientset.Interface
-
-	// libovsdb northbound client interface
-	nbClient         libovsdbclient.Client
-	eventBroadcaster record.EventBroadcaster
-	eventRecorder    record.EventRecorder
-
-	// serviceLister is able to list/get services and is populated by the shared informer passed to
-	serviceLister corelisters.ServiceLister
-	// servicesSynced returns true if the service shared informer has been synced at least once.
-	servicesSynced cache.InformerSynced
-
-	// endpointSliceLister is able to list/get endpoint slices and is populated
-	// by the shared informer passed to NewController
-	endpointSliceLister discoverylisters.EndpointSliceLister
-	// endpointSlicesSynced returns true if the endpoint slice shared informer
-	// has been synced at least once. Added as a member to the struct to allow
-	// injection for testing.
+	client               clientset.Interface
+	nbClient             libovsdbclient.Client
+	eventBroadcaster     record.EventBroadcaster
+	eventRecorder        record.EventRecorder
+	serviceLister        corelisters.ServiceLister
+	queue                workqueue.RateLimitingInterface
+	endpointSliceLister  discoverylisters.EndpointSliceLister
+	nodesSynced          cache.InformerSynced
 	endpointSlicesSynced cache.InformerSynced
-
-	nodesSynced cache.InformerSynced
-
-	// Services that need to be updated. A channel is inappropriate here,
-	// because it allows services with lots of pods to be serviced much
-	// more often than services with few pods; it also would cause a
-	// service that's inserted multiple times to be processed more than
-	// necessary.
-	queue workqueue.RateLimitingInterface
-
-	// workerLoopPeriod is the time between worker runs. The workers process the queue of service and pod changes.
-	workerLoopPeriod time.Duration
-
-	// repair contains a controller that keeps in sync OVN and Kubernetes services
-	repair *repair
-
-	// nodeTracker
-	nodeTracker *nodeTracker
-
-	// alreadyApplied is a map of service key -> already applied configuration, so we can short-circuit
-	// if a service's config hasn't changed
-	alreadyApplied     map[string][]ovnlb.LB
-	alreadyAppliedLock sync.Mutex
-
-	// 'true' if Load_Balancer_Group is supported.
-	useLBGroups bool
+	servicesSynced       cache.InformerSynced
+	alreadyApplied       map[string][]ovnlb.LB
+	repair               *repair
+	nodeTracker          *nodeTracker
+	workerLoopPeriod     time.Duration
+	alreadyAppliedLock   sync.Mutex
+	useLBGroups          bool
 }
 
 // Run will not return until stopCh is closed. workers determines how many

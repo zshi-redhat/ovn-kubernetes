@@ -16,15 +16,15 @@ import (
 )
 
 type fakePortManager struct {
+	tPortsMap       map[utilnet.LocalPort]bool
 	tPortOpen       []int32
 	tPortClose      []int32
-	tProtocolOpen   []kapi.Protocol
 	tProtocolClose  []kapi.Protocol
 	tIPOpen         []string
 	tIPClose        []string
+	tProtocolOpen   []kapi.Protocol
 	tPortOpenCount  int
 	tPortCloseCount int
-	tPortsMap       map[utilnet.LocalPort]bool
 }
 
 type fakePortOpener struct{}

@@ -28,17 +28,17 @@ const (
 )
 
 type egressFirewall struct {
-	sync.Mutex
 	name        string
 	namespace   string
 	egressRules []*egressFirewallRule
+	sync.Mutex
 }
 
 type egressFirewallRule struct {
-	id     int
+	to     destination
 	access egressfirewallapi.EgressFirewallRuleType
 	ports  []egressfirewallapi.EgressFirewallPort
-	to     destination
+	id     int
 }
 
 type destination struct {
@@ -415,8 +415,8 @@ func (oc *Controller) deleteEgressFirewallRules(externalID string) error {
 }
 
 type matchTarget struct {
-	kind  matchKind
 	value string
+	kind  matchKind
 }
 
 type matchKind int

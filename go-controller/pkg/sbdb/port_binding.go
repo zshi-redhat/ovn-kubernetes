@@ -7,24 +7,24 @@ import "github.com/ovn-org/libovsdb/model"
 
 // PortBinding defines an object in Port_Binding table
 type PortBinding struct {
-	UUID             string            `ovsdb:"_uuid"`
+	Options          map[string]string `ovsdb:"options"`
 	Chassis          *string           `ovsdb:"chassis"`
-	Datapath         string            `ovsdb:"datapath"`
+	Tag              *int              `ovsdb:"tag"`
 	Encap            *string           `ovsdb:"encap"`
 	ExternalIDs      map[string]string `ovsdb:"external_ids"`
-	GatewayChassis   []string          `ovsdb:"gateway_chassis"`
-	HaChassisGroup   *string           `ovsdb:"ha_chassis_group"`
-	LogicalPort      string            `ovsdb:"logical_port"`
-	MAC              []string          `ovsdb:"mac"`
-	NatAddresses     []string          `ovsdb:"nat_addresses"`
-	Options          map[string]string `ovsdb:"options"`
-	ParentPort       *string           `ovsdb:"parent_port"`
-	RequestedChassis *string           `ovsdb:"requested_chassis"`
-	Tag              *int              `ovsdb:"tag"`
-	TunnelKey        int               `ovsdb:"tunnel_key"`
-	Type             string            `ovsdb:"type"`
 	Up               *bool             `ovsdb:"up"`
+	HaChassisGroup   *string           `ovsdb:"ha_chassis_group"`
+	RequestedChassis *string           `ovsdb:"requested_chassis"`
+	ParentPort       *string           `ovsdb:"parent_port"`
 	VirtualParent    *string           `ovsdb:"virtual_parent"`
+	UUID             string            `ovsdb:"_uuid"`
+	Type             string            `ovsdb:"type"`
+	LogicalPort      string            `ovsdb:"logical_port"`
+	Datapath         string            `ovsdb:"datapath"`
+	MAC              []string          `ovsdb:"mac"`
+	GatewayChassis   []string          `ovsdb:"gateway_chassis"`
+	NatAddresses     []string          `ovsdb:"nat_addresses"`
+	TunnelKey        int               `ovsdb:"tunnel_key"`
 }
 
 func copyPortBindingChassis(a *string) *string {

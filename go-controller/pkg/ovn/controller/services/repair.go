@@ -34,18 +34,11 @@ import (
 // We need to execute in two phases so that we don't disrupt any vips being handled by
 // legacy load balancers before we've had a change to migrate those vips.
 type repair struct {
-	sync.Mutex
-	serviceLister corelisters.ServiceLister
-
-	// We want to run some functions after every service is successfully synced, so populate this
-	// list with every service that should be in the informer queue before we start the ServiceController
-	// workers.
+	serviceLister    corelisters.ServiceLister
+	nbClient         libovsdbclient.Client
 	unsyncedServices sets.String
-
-	// Really a boolean, but an int32 for atomicity purposes
+	sync.Mutex
 	semLegacyLBsDeleted uint32
-
-	nbClient libovsdbclient.Client
 }
 
 // NewRepair creates a controller that periodically ensures that there is no stale data in OVN
