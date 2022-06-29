@@ -91,7 +91,9 @@ func (oc *Controller) Start(identity string, wg *sync.WaitGroup, ctx context.Con
 				start := time.Now()
 				defer func() {
 					end := time.Since(start)
-					metrics.MetricMasterReadyDuration.Set(end.Seconds())
+					if config.Metrics.BindAddress != "" {
+						metrics.MetricMasterReadyDuration.Set(end.Seconds())
+					}
 				}()
 
 				if err := oc.StartClusterMaster(); err != nil {
@@ -118,7 +120,9 @@ func (oc *Controller) Start(identity string, wg *sync.WaitGroup, ctx context.Con
 		},
 	}
 
-	leaderelection.SetProvider(ovnkubeMasterLeaderMetricsProvider{})
+	if config.Metrics.BindAddress != "" {
+		leaderelection.SetProvider(ovnkubeMasterLeaderMetricsProvider{})
+	}
 	leaderElector, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
 		return err
@@ -218,17 +222,21 @@ func (oc *Controller) upgradeOVNTopology(existingNodes *kapi.NodeList) error {
 func (oc *Controller) StartClusterMaster() error {
 	klog.Infof("Starting cluster master")
 
-	metrics.RegisterMasterPerformance(oc.nbClient)
-	metrics.RegisterMasterFunctional()
-	metrics.RunTimestamp(oc.stopChan, oc.sbClient, oc.nbClient)
-	metrics.MonitorIPSec(oc.nbClient)
+	if config.Metrics.BindAddress != "" {
+		metrics.RegisterMasterPerformance(oc.nbClient)
+		metrics.RegisterMasterFunctional()
+		metrics.RunTimestamp(oc.stopChan, oc.sbClient, oc.nbClient)
+		metrics.MonitorIPSec(oc.nbClient)
+	}
 	if config.Metrics.EnableConfigDuration {
 		// with k=10,
 		//  for a cluster with 10 nodes, measurement of 1 in every 100 requests
 		//  for a cluster with 100 nodes, measurement of 1 in every 1000 requests
 		metrics.GetConfigDurationRecorder().Run(oc.nbClient, oc.kube, 10, time.Second*5, oc.stopChan)
 	}
-	oc.podRecorder.Run(oc.sbClient, oc.stopChan)
+	if config.Metrics.BindAddress != "" {
+		oc.podRecorder.Run(oc.sbClient, oc.stopChan)
+	}
 
 	// enableOVNLogicalDataPathGroups sets an OVN flag to enable logical datapath
 	// groups on OVN 20.12 and later. The option is ignored if OVN doesn't
@@ -271,7 +279,9 @@ func (oc *Controller) StartClusterMaster() error {
 	}
 
 	// update metrics for host subnets
-	metrics.RecordSubnetCount(v4HostSubnetCount, v6HostSubnetCount)
+	if config.Metrics.BindAddress != "" {
+		metrics.RecordSubnetCount(v4HostSubnetCount, v6HostSubnetCount)
+	}
 
 	if oc.multicastSupport {
 		if _, _, err := util.RunOVNSbctl("--columns=_uuid", "list", "IGMP_Group"); err != nil {
@@ -983,7 +993,9 @@ func (oc *Controller) addNode(node *kapi.Node) ([]*net.IPNet, error) {
 				&oc.v4HostSubnetsUsed,
 				&oc.v6HostSubnetsUsed, true)
 		}
-		metrics.RecordSubnetUsage(oc.v4HostSubnetsUsed, oc.v6HostSubnetsUsed)
+		if config.Metrics.BindAddress != "" {
+			metrics.RecordSubnetUsage(oc.v4HostSubnetsUsed, oc.v6HostSubnetsUsed)
+		}
 	}
 	return hostSubnets, nil
 }
@@ -1073,7 +1085,9 @@ func (oc *Controller) deleteNode(nodeName string, hostSubnets []*net.IPNet) erro
 		util.UpdateUsedHostSubnetsCount(hostSubnet, &oc.v4HostSubnetsUsed, &oc.v6HostSubnetsUsed, false)
 	}
 	// update metrics
-	metrics.RecordSubnetUsage(oc.v4HostSubnetsUsed, oc.v6HostSubnetsUsed)
+	if config.Metrics.BindAddress != "" {
+		metrics.RecordSubnetUsage(oc.v4HostSubnetsUsed, oc.v6HostSubnetsUsed)
+	}
 
 	if err := oc.deleteNodeLogicalNetwork(nodeName); err != nil {
 		return fmt.Errorf("error deleting node %s logical network: %v", nodeName, err)
@@ -1217,7 +1231,9 @@ func (oc *Controller) syncNodesRetriable(nodes []interface{}) error {
 			klog.Errorf("Failed to get join switch port IP address for node %s: %v", node.Name, err)
 		}
 	}
-	metrics.RecordSubnetUsage(oc.v4HostSubnetsUsed, oc.v6HostSubnetsUsed)
+	if config.Metrics.BindAddress != "" {
+		metrics.RecordSubnetUsage(oc.v4HostSubnetsUsed, oc.v6HostSubnetsUsed)
+	}
 
 	p := func(item *nbdb.LogicalSwitch) bool {
 		return len(item.OtherConfig) > 0

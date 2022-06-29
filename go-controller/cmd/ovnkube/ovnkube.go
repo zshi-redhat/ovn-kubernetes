@@ -12,7 +12,6 @@ import (
 	"syscall"
 	"text/tabwriter"
 	"text/template"
-	"time"
 
 	"k8s.io/klog/v2"
 
@@ -240,7 +239,9 @@ func runOvnKube(ctx *cli.Context) error {
 		}
 
 		// register prometheus metrics that do not depend on becoming ovnkube-master leader
-		metrics.RegisterMasterBase()
+		if config.Metrics.BindAddress != "" {
+			metrics.RegisterMasterBase()
+		}
 
 		ovnController := ovn.NewOvnController(ovnClientset, masterWatchFactory, stopChan, nil,
 			libovsdbOvnNBClient, libovsdbOvnSBClient, util.EventRecorder(ovnClientset.KubeClient))
@@ -266,14 +267,13 @@ func runOvnKube(ctx *cli.Context) error {
 			return fmt.Errorf("cannot initialize node without service account 'token'. Please provide one with --k8s-token argument")
 		}
 		// register ovnkube node specific prometheus metrics exported by the node
-		metrics.RegisterNodeMetrics()
-		start := time.Now()
+		if config.Metrics.BindAddress != "" {
+			metrics.RegisterNodeMetrics()
+		}
 		n := ovnnode.NewNode(ovnClientset.KubeClient, nodeWatchFactory, node, stopChan, util.EventRecorder(ovnClientset.KubeClient))
 		if err := n.Start(ctx.Context, wg); err != nil {
 			return err
 		}
-		end := time.Since(start)
-		metrics.MetricNodeReadyDuration.Set(end.Seconds())
 	}
 
 	// now that ovnkube master/node are running, lets expose the metrics HTTP endpoint if configured
