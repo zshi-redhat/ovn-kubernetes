@@ -13,6 +13,7 @@ import (
 	"text/tabwriter"
 	"text/template"
 
+	"k8s.io/client-go/tools/record"
 	"k8s.io/klog/v2"
 
 	libovsdbclient "github.com/ovn-org/libovsdb/client"
@@ -220,6 +221,7 @@ func runOvnKube(ctx *cli.Context) error {
 
 	var watchFactory factory.Shutdownable
 	var masterWatchFactory *factory.WatchFactory
+	var masterEventRecorder record.EventRecorder
 	if master != "" {
 		var err error
 		// create factory and start the controllers asked for
@@ -242,9 +244,9 @@ func runOvnKube(ctx *cli.Context) error {
 		if config.Metrics.BindAddress != "" {
 			metrics.RegisterMasterBase()
 		}
-
+		masterEventRecorder = util.EventRecorder(ovnClientset.KubeClient)
 		ovnController := ovn.NewOvnController(ovnClientset, masterWatchFactory, stopChan, nil,
-			libovsdbOvnNBClient, libovsdbOvnSBClient, util.EventRecorder(ovnClientset.KubeClient))
+			libovsdbOvnNBClient, libovsdbOvnSBClient, masterEventRecorder)
 		if err := ovnController.Start(master, wg, ctx.Context); err != nil {
 			return err
 		}
@@ -252,6 +254,8 @@ func runOvnKube(ctx *cli.Context) error {
 
 	if node != "" {
 		var nodeWatchFactory factory.NodeWatchFactory
+		var nodeEventRecorder record.EventRecorder
+
 		if masterWatchFactory == nil {
 			var err error
 			nodeWatchFactory, err = factory.NewNodeWatchFactory(ovnClientset, node)
@@ -263,6 +267,12 @@ func runOvnKube(ctx *cli.Context) error {
 			nodeWatchFactory = masterWatchFactory
 		}
 
+		if masterEventRecorder == nil {
+			nodeEventRecorder = util.EventRecorder(ovnClientset.KubeClient)
+		} else {
+			nodeEventRecorder = masterEventRecorder
+		}
+
 		if config.Kubernetes.Token == "" {
 			return fmt.Errorf("cannot initialize node without service account 'token'. Please provide one with --k8s-token argument")
 		}
@@ -270,7 +280,7 @@ func runOvnKube(ctx *cli.Context) error {
 		if config.Metrics.BindAddress != "" {
 			metrics.RegisterNodeMetrics()
 		}
-		n := ovnnode.NewNode(ovnClientset.KubeClient, nodeWatchFactory, node, stopChan, util.EventRecorder(ovnClientset.KubeClient))
+		n := ovnnode.NewNode(ovnClientset.KubeClient, nodeWatchFactory, node, stopChan, nodeEventRecorder)
 		if err := n.Start(ctx.Context, wg); err != nil {
 			return err
 		}
