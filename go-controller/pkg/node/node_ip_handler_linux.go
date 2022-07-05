@@ -145,6 +145,7 @@ func (c *addressManager) Run(stopChan <-chan struct{}, doneWg *sync.WaitGroup) {
 					c.OnChanged()
 				}
 			case <-addressSyncTimer.C:
+				continue
 				if subscribed {
 					klog.V(5).Info("Node IP manager calling sync() explicitly")
 					c.sync()
