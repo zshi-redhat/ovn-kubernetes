@@ -2,10 +2,11 @@ package node
 
 import (
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"net"
 	"strings"
 	"time"
+
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	"k8s.io/klog/v2"
 
@@ -116,16 +117,18 @@ func managementPortReady() (bool, error) {
 		return false, nil
 	}
 
-	// OpenFlow table 65 performs logical-to-physical translation. It matches the packet’s logical
-	// egress  port. Its actions output the packet to the port attached to the OVN integration bridge
-	// that represents that logical  port.
-	stdout, _, err := util.RunOVSOfctl("--no-stats", "--no-names", "dump-flows", "br-int",
-		"table=65,out_port="+ofport)
-	if err != nil {
-		return false, nil
-	}
-	if !strings.Contains(stdout, "actions=output:"+ofport) {
-		return false, nil
+	if config.Gateway.Mode != config.GatewayModeDisabled {
+		// OpenFlow table 65 performs logical-to-physical translation. It matches the packet’s logical
+		// egress  port. Its actions output the packet to the port attached to the OVN integration bridge
+		// that represents that logical  port.
+		stdout, _, err := util.RunOVSOfctl("--no-stats", "--no-names", "dump-flows", "br-int",
+			"table=65,out_port="+ofport)
+		if err != nil {
+			return false, nil
+		}
+		if !strings.Contains(stdout, "actions=output:"+ofport) {
+			return false, nil
+		}
 	}
 	klog.Info("Management port is ready")
 	return true, nil

@@ -25,6 +25,7 @@ const (
 	iptableETPChain        = "OVN-KUBE-ETP"        // called from nat-PREROUTING only
 	iptableITPChain        = "OVN-KUBE-ITP"        // called from mangle-OUTPUT and nat-OUTPUT
 	iptableESVCChain       = "OVN-KUBE-EGRESS-SVC" // called from nat-POSTROUTING
+	iptableMgmtPortChain   = "OVN-KUBE-MGMTPORT"   // called from nat-PREROUTING and nat-OUTPUT
 )
 
 func clusterIPTablesProtocols() []iptables.Protocol {
@@ -165,6 +166,52 @@ func getLegacySharedGatewayInitRules(chain string, proto iptables.Protocol) []ip
 			chain:    "FORWARD",
 			args:     []string{"-j", chain},
 			protocol: proto,
+		},
+	}
+}
+
+func getLegacyEmptyGatewayInitRules(chain string, proto iptables.Protocol) []iptRule {
+	return []iptRule{}
+}
+
+func getEmptyGatewayNodePortIPTRules(svcPort kapi.ServicePort, targetIP string, targetPort int32, svcHasLocalHostNetEndPnt bool, nodeIP string) []iptRule {
+	chainName := iptableNodePortChain
+	if svcHasLocalHostNetEndPnt {
+		// DNAT it to the nodeIP:nodePort instead of clusterIP:targetPort
+		targetIP = nodeIP
+		targetPort = int32(svcPort.TargetPort.IntValue())
+	}
+	return []iptRule{
+		{
+			table: "nat",
+			chain: chainName,
+			args: []string{
+				"-p", string(svcPort.Protocol),
+				"-m", "addrtype",
+				"--dst-type", "LOCAL",
+				"--dport", fmt.Sprintf("%d", svcPort.NodePort),
+				"-j", "DNAT",
+				"--to-destination", util.JoinHostPortInt32(targetIP, targetPort),
+			},
+			protocol: getIPTablesProtocol(targetIP),
+		},
+	}
+}
+
+func getEmptyGatewayMgmtPortIPTRules(svcPort kapi.ServicePort, targetIP string, targetPort int32, nodeIP string) []iptRule {
+	chainName := iptableMgmtPortChain
+	return []iptRule{
+		{
+			table: "nat",
+			chain: chainName,
+			args: []string{
+				"-p", string(svcPort.Protocol),
+				"--dst", fmt.Sprintf("%s", targetIP),
+				"--dport", fmt.Sprintf("%d", svcPort.Port),
+				"-j", "DNAT",
+				"--to-destination", util.JoinHostPortInt32(nodeIP, targetPort),
+			},
+			protocol: getIPTablesProtocol(targetIP),
 		},
 	}
 }
@@ -336,9 +383,30 @@ func getLocalGatewayNATRules(ifname string, cidr *net.IPNet) []iptRule {
 	}
 }
 
+func getEmptyGatewayNATRules(ifname string, cidr *net.IPNet) []iptRule {
+	// Allow packets to/from the gateway interface in case defaults deny
+	protocol := getIPTablesProtocol(cidr.IP.String())
+	return []iptRule{
+		{
+			table: "nat",
+			chain: "POSTROUTING",
+			args: []string{
+				"-s", cidr.String(),
+				"-j", "MASQUERADE",
+			},
+			protocol: protocol,
+		},
+	}
+}
+
 // initLocalGatewayNATRules sets up iptables rules for interfaces
 func initLocalGatewayNATRules(ifname string, cidr *net.IPNet) error {
 	return addIptRules(getLocalGatewayNATRules(ifname, cidr))
+}
+
+// initEmptyGatewayNATRules sets up iptables rules for interfaces
+func initEmptyGatewayNATRules(ifname string, cidr *net.IPNet) error {
+	return addIptRules(getEmptyGatewayNATRules(ifname, cidr))
 }
 
 func addChaintoTable(ipt util.IPTablesHelper, tableName, chain string) {
@@ -350,7 +418,7 @@ func addChaintoTable(ipt util.IPTablesHelper, tableName, chain string) {
 func handleGatewayIPTables(iptCallback func(rules []iptRule) error, genGatewayChainRules func(chain string, proto iptables.Protocol) []iptRule) error {
 	rules := make([]iptRule, 0)
 	// (NOTE: Order is important, add jump to iptableETPChain before jump to NP/EIP chains)
-	for _, chain := range []string{iptableITPChain, iptableESVCChain, iptableNodePortChain, iptableExternalIPChain, iptableETPChain} {
+	for _, chain := range []string{iptableITPChain, iptableESVCChain, iptableMgmtPortChain, iptableNodePortChain, iptableExternalIPChain, iptableETPChain} {
 		for _, proto := range clusterIPTablesProtocols() {
 			ipt, err := util.GetIPTablesHelper(proto)
 			if err != nil {
@@ -365,6 +433,16 @@ func handleGatewayIPTables(iptCallback func(rules []iptRule) error, genGatewayCh
 	}
 	if err := iptCallback(rules); err != nil {
 		return fmt.Errorf("failed to handle iptables rules %v: %v", rules, err)
+	}
+	return nil
+}
+
+func initEmptyGatewayIPTables() error {
+	if err := handleGatewayIPTables(addIptRules, getGatewayInitRules); err != nil {
+		return err
+	}
+	if err := handleGatewayIPTables(delIptRules, getLegacyEmptyGatewayInitRules); err != nil {
+		return err
 	}
 	return nil
 }
@@ -424,7 +502,7 @@ func recreateIPTRules(table, chain string, keepIPTRules []iptRule) {
 // case3: if svcHasLocalHostNetEndPnt and svcTypeIsITPLocal, rule that redirects clusterIP traffic to host targetPort is added.
 //        if !svcHasLocalHostNetEndPnt and svcTypeIsITPLocal, rule that marks clusterIP traffic to steer it to ovn-k8s-mp0 is added.
 //
-func getGatewayIPTRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool) []iptRule {
+func getGatewayIPTRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool, nodeIP string) []iptRule {
 	rules := make([]iptRule, 0)
 	clusterIPs := util.GetClusterIPs(service)
 	svcTypeIsETPLocal := util.ServiceExternalTrafficPolicyLocal(service)
@@ -442,15 +520,24 @@ func getGatewayIPTRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool) []
 				continue
 			}
 			for _, clusterIP := range clusterIPs {
-				if svcTypeIsETPLocal && !svcHasLocalHostNetEndPnt {
-					// case1 (see function description for details)
-					// A DNAT rule to masqueradeIP is added that takes priority over DNAT to clusterIP.
-					rules = append(rules, getNodePortIPTRules(svcPort, clusterIP, svcPort.NodePort, svcHasLocalHostNetEndPnt, svcTypeIsETPLocal)...)
-					// add a skip SNAT rule to OVN-KUBE-SNAT-MGMTPORT to preserve sourceIP for etp=local traffic.
-					rules = append(rules, getNodePortETPLocalIPTRules(svcPort, clusterIP)...)
+				if config.Gateway.Mode == config.GatewayModeDisabled {
+					rules = append(rules, getEmptyGatewayNodePortIPTRules(svcPort, clusterIP, svcPort.Port, svcHasLocalHostNetEndPnt, nodeIP)...)
+				} else {
+					if svcTypeIsETPLocal && !svcHasLocalHostNetEndPnt {
+						// case1 (see function description for details)
+						// A DNAT rule to masqueradeIP is added that takes priority over DNAT to clusterIP.
+						rules = append(rules, getNodePortIPTRules(svcPort, clusterIP, svcPort.NodePort, svcHasLocalHostNetEndPnt, svcTypeIsETPLocal)...)
+						// add a skip SNAT rule to OVN-KUBE-SNAT-MGMTPORT to preserve sourceIP for etp=local traffic.
+						rules = append(rules, getNodePortETPLocalIPTRules(svcPort, clusterIP)...)
+					}
+					// case2 (see function description for details)
+					rules = append(rules, getNodePortIPTRules(svcPort, clusterIP, svcPort.Port, svcHasLocalHostNetEndPnt, false)...)
 				}
-				// case2 (see function description for details)
-				rules = append(rules, getNodePortIPTRules(svcPort, clusterIP, svcPort.Port, svcHasLocalHostNetEndPnt, false)...)
+			}
+		}
+		if config.Gateway.Mode == config.GatewayModeDisabled && svcHasLocalHostNetEndPnt {
+			for _, clusterIP := range clusterIPs {
+				rules = append(rules, getEmptyGatewayMgmtPortIPTRules(svcPort, clusterIP, int32(svcPort.TargetPort.IntValue()), nodeIP)...)
 			}
 		}
 		externalIPs := make([]string, 0, len(service.Spec.ExternalIPs)+len(service.Status.LoadBalancer.Ingress))

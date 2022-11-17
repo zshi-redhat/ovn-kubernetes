@@ -20,6 +20,7 @@ import (
 
 type addressManager struct {
 	nodeName       string
+	nodePrimaryIP  string
 	watchFactory   factory.NodeWatchFactory
 	addresses      sets.String
 	nodeAnnotator  kube.Annotator

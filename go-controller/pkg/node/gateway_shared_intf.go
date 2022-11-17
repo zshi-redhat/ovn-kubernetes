@@ -422,17 +422,19 @@ func (npw *nodePortWatcher) updateServiceInfo(index ktypes.NamespacedName, servi
 func addServiceRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool, npw *nodePortWatcher) {
 	// For dpu or Full mode
 	if npw != nil {
-		npw.updateServiceFlowCache(service, true, svcHasLocalHostNetEndPnt)
-		npw.ofm.requestFlowSync()
+		if config.Gateway.Mode != config.GatewayModeDisabled {
+			npw.updateServiceFlowCache(service, true, svcHasLocalHostNetEndPnt)
+			npw.ofm.requestFlowSync()
+		}
 		if !npw.dpuMode {
 			// add iptable rules only in full mode
-			addGatewayIptRules(service, svcHasLocalHostNetEndPnt)
+			addGatewayIptRules(service, svcHasLocalHostNetEndPnt, npw.nodeIPManager.nodePrimaryIP)
 			updateEgressSVCIptRules(service, npw)
 		}
 		return
 	}
 	// For Host Only Mode
-	addGatewayIptRules(service, svcHasLocalHostNetEndPnt)
+	addGatewayIptRules(service, svcHasLocalHostNetEndPnt, npw.nodeIPManager.nodePrimaryIP)
 }
 
 // delServiceRules deletes all possible iptables rules and OpenFlow physical
@@ -440,8 +442,10 @@ func addServiceRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool, npw *
 func delServiceRules(service *kapi.Service, npw *nodePortWatcher) {
 	// full mode || dpu mode
 	if npw != nil {
-		npw.updateServiceFlowCache(service, false, false)
-		npw.ofm.requestFlowSync()
+		if config.Gateway.Mode != config.GatewayModeDisabled {
+			npw.updateServiceFlowCache(service, false, false)
+			npw.ofm.requestFlowSync()
+		}
 		if !npw.dpuMode {
 			// Always try and delete all rules here in full mode & in host only mode. We don't touch iptables in dpu mode.
 			// +--------------------------+-----------------------+-----------------------+--------------------------------+
@@ -469,15 +473,15 @@ func delServiceRules(service *kapi.Service, npw *nodePortWatcher) {
 			// |                          |                       |                       |   + default dnat towards CIP   |
 			// +--------------------------+-----------------------+-----------------------+--------------------------------+
 
-			delGatewayIptRules(service, true)
-			delGatewayIptRules(service, false)
+			delGatewayIptRules(service, true, npw.nodeIPManager.nodePrimaryIP)
+			delGatewayIptRules(service, false, npw.nodeIPManager.nodePrimaryIP)
 			delAllEgressSVCIptRules(service, npw)
 		}
 		return
 	}
 
-	delGatewayIptRules(service, true)
-	delGatewayIptRules(service, false)
+	delGatewayIptRules(service, true, npw.nodeIPManager.nodePrimaryIP)
+	delGatewayIptRules(service, false, npw.nodeIPManager.nodePrimaryIP)
 }
 
 func serviceUpdateNotNeeded(old, new *kapi.Service) bool {
@@ -636,11 +640,13 @@ func (npw *nodePortWatcher) SyncServices(services []interface{}) error {
 		hasLocalHostNetworkEp := hasLocalHostNetworkEndpoints(epSlices, nodeIPs)
 		npw.getAndSetServiceInfo(name, service, hasLocalHostNetworkEp)
 		// Delete OF rules for service if they exist
-		npw.updateServiceFlowCache(service, false, hasLocalHostNetworkEp)
-		npw.updateServiceFlowCache(service, true, hasLocalHostNetworkEp)
+		if config.Gateway.Mode != config.GatewayModeDisabled {
+			npw.updateServiceFlowCache(service, false, hasLocalHostNetworkEp)
+			npw.updateServiceFlowCache(service, true, hasLocalHostNetworkEp)
+		}
 		// Add correct iptables rules only for Full mode
 		if !npw.dpuMode {
-			keepIPTRules = append(keepIPTRules, getGatewayIPTRules(service, hasLocalHostNetworkEp)...)
+			keepIPTRules = append(keepIPTRules, getGatewayIPTRules(service, hasLocalHostNetworkEp, npw.nodeIPManager.nodePrimaryIP)...)
 		}
 
 		if !npw.dpuMode && shouldConfigureEgressSVC(service, npw) {
@@ -673,7 +679,9 @@ func (npw *nodePortWatcher) SyncServices(services []interface{}) error {
 		}
 	}
 	// sync OF rules once
-	npw.ofm.requestFlowSync()
+	if config.Gateway.Mode != config.GatewayModeDisabled {
+		npw.ofm.requestFlowSync()
+	}
 	// sync IPtables rules once only for Full mode
 	if !npw.dpuMode {
 		// (NOTE: Order is important, add jump to iptableETPChain before jump to NP/EIP chains)
@@ -860,7 +868,7 @@ func (npwipt *nodePortWatcherIptables) SyncServices(services []interface{}) erro
 		}
 		// Add correct iptables rules.
 		// TODO: ETP and ITP is not implemented for smart NIC mode.
-		keepIPTRules = append(keepIPTRules, getGatewayIPTRules(service, false)...)
+		keepIPTRules = append(keepIPTRules, getGatewayIPTRules(service, false, "")...)
 	}
 
 	// sync IPtables rules once
@@ -1509,20 +1517,27 @@ func newSharedGateway(nodeName string, subnets []*net.IPNet, gwNextHops []net.IP
 
 func newNodePortWatcher(patchPort, gwBridge, gwIntf, nodeName string, ips []*net.IPNet, ofm *openflowManager,
 	nodeIPManager *addressManager, watchFactory factory.NodeWatchFactory) (*nodePortWatcher, error) {
-	// Get ofport of patchPort
-	ofportPatch, stderr, err := util.GetOVSOfPort("--if-exists", "get",
-		"interface", patchPort, "ofport")
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
-			patchPort, stderr, err)
-	}
+	var ofportPatch string
+	var ofportPhys string
+	var stderr string
+	var err error
 
-	// Get ofport of physical interface
-	ofportPhys, stderr, err := util.GetOVSOfPort("--if-exists", "get",
-		"interface", gwIntf, "ofport")
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
-			gwIntf, stderr, err)
+	if config.Gateway.Mode != config.GatewayModeDisabled {
+		// Get ofport of patchPort
+		ofportPatch, stderr, err = util.GetOVSOfPort("--if-exists", "get",
+			"interface", patchPort, "ofport")
+		if err != nil {
+			return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
+				patchPort, stderr, err)
+		}
+
+		// Get ofport of physical interface
+		ofportPhys, stderr, err = util.GetOVSOfPort("--if-exists", "get",
+			"interface", gwIntf, "ofport")
+		if err != nil {
+			return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
+				gwIntf, stderr, err)
+		}
 	}
 
 	// In the shared gateway mode, the NodePort service is handled by the OpenFlow flows configured
@@ -1533,11 +1548,15 @@ func newNodePortWatcher(patchPort, gwBridge, gwIntf, nodeName string, ips []*net
 	// running on DPU or on DPU-Host.
 	if config.OvnKubeNode.Mode == types.NodeModeFull {
 		if config.Gateway.Mode == config.GatewayModeLocal {
-			if err := initLocalGatewayIPTables(); err != nil {
+			if err = initLocalGatewayIPTables(); err != nil {
 				return nil, err
 			}
 		} else if config.Gateway.Mode == config.GatewayModeShared {
-			if err := initSharedGatewayIPTables(); err != nil {
+			if err = initSharedGatewayIPTables(); err != nil {
+				return nil, err
+			}
+		} else if config.Gateway.Mode == config.GatewayModeDisabled {
+			if err = initEmptyGatewayIPTables(); err != nil {
 				return nil, err
 			}
 		}

@@ -642,12 +642,14 @@ func (oc *Controller) syncNodeGateway(node *kapi.Node, hostSubnets []*net.IPNet)
 	}
 
 	if l3GatewayConfig.Mode == config.GatewayModeDisabled {
-		if err := oc.gatewayCleanup(node.Name); err != nil {
-			return fmt.Errorf("error cleaning up gateway for node %s: %v", node.Name, err)
-		}
-		if err := oc.joinSwIPManager.ReleaseJoinLRPIPs(node.Name); err != nil {
-			return err
-		}
+		/*
+			if err := oc.gatewayCleanup(node.Name); err != nil {
+				return fmt.Errorf("error cleaning up gateway for node %s: %v", node.Name, err)
+			}
+			if err := oc.joinSwIPManager.ReleaseJoinLRPIPs(node.Name); err != nil {
+				return err
+			}
+		*/
 	} else if hostSubnets != nil {
 		var hostAddrs sets.String
 		if config.Gateway.Mode == config.GatewayModeShared {

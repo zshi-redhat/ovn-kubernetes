@@ -58,8 +58,8 @@ func deleteLocalNodeAccessBridge() error {
 }
 
 // addGatewayIptRules adds the necessary iptable rules for a service on the node
-func addGatewayIptRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool) {
-	rules := getGatewayIPTRules(service, svcHasLocalHostNetEndPnt)
+func addGatewayIptRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool, nodeIP string) {
+	rules := getGatewayIPTRules(service, svcHasLocalHostNetEndPnt, nodeIP)
 
 	if err := addIptRules(rules); err != nil {
 		klog.Errorf("Failed to add iptables rules for service %s/%s: %v", service.Namespace, service.Name, err)
@@ -67,8 +67,8 @@ func addGatewayIptRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool) {
 }
 
 // delGatewayIptRules removes the iptable rules for a service from the node
-func delGatewayIptRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool) {
-	rules := getGatewayIPTRules(service, svcHasLocalHostNetEndPnt)
+func delGatewayIptRules(service *kapi.Service, svcHasLocalHostNetEndPnt bool, nodeIP string) {
+	rules := getGatewayIPTRules(service, svcHasLocalHostNetEndPnt, nodeIP)
 
 	if err := delIptRules(rules); err != nil {
 		klog.Errorf("Failed to delete iptables rules for service %s/%s: %v", service.Namespace, service.Name, err)

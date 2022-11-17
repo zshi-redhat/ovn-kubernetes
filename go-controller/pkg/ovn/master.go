@@ -499,7 +499,7 @@ func (oc *Controller) syncNodeManagementPort(node *kapi.Node, hostSubnets []*net
 			v4Subnet = hostSubnet
 		}
 
-		if config.Gateway.Mode == config.GatewayModeLocal {
+		if config.Gateway.Mode == config.GatewayModeLocal || config.Gateway.Mode == config.GatewayModeDisabled {
 			lrsr := nbdb.LogicalRouterStaticRoute{
 				Policy:   &nbdb.LogicalRouterStaticRoutePolicySrcIP,
 				IPPrefix: hostSubnet.String(),

@@ -185,7 +185,6 @@ func setupOVNNode(node *kapi.Node) error {
 			return fmt.Errorf("invalid encapsulation IP provided %q", encapIP)
 		}
 	}
-
 	setExternalIdsCmd := []string{
 		"set",
 		"Open_vSwitch",
@@ -219,7 +218,7 @@ func setupOVNNode(node *kapi.Node) error {
 		return fmt.Errorf("error setting OVS external IDs: %v\n  %q", err, stderr)
 	}
 	// If EncapPort is not the default tell sbdb to use specified port.
-	if config.Default.EncapPort != config.DefaultEncapPort {
+	if config.Default.EncapPort != config.DefaultEncapPort && config.Gateway.Mode != config.GatewayModeDisabled {
 		systemID, err := util.GetNodeChassisID()
 		if err != nil {
 			return err
@@ -419,7 +418,7 @@ func (n *OvnNode) Start(ctx context.Context, wg *sync.WaitGroup) error {
 			return err
 		}
 	} else {
-		if err := n.initGateway(subnets, nodeAnnotator, waiter, mgmtPortConfig, nodeAddr); err != nil {
+		if err := n.initGateway(subnets, nodeAnnotator, waiter, mgmtPortConfig, nodeAddrStr); err != nil {
 			return err
 		}
 	}
@@ -448,15 +447,38 @@ func (n *OvnNode) Start(ctx context.Context, wg *sync.WaitGroup) error {
 			return fmt.Errorf("failed to get initial topology version: %w", err)
 		}
 		klog.Infof("Current control-plane topology version is %d", initialTopoVersion)
-		bridgeName := n.gateway.GetGatewayBridgeIface()
+		var bridgeName string
+		if config.Gateway.Mode != config.GatewayModeDisabled {
+			bridgeName = n.gateway.GetGatewayBridgeIface()
+		}
 
 		needLegacySvcRoute := true
 		if (initialTopoVersion >= types.OvnHostToSvcOFTopoVersion && config.GatewayModeShared == config.Gateway.Mode) ||
-			(initialTopoVersion >= types.OvnRoutingViaHostTopoVersion) {
+			(initialTopoVersion >= types.OvnRoutingViaHostTopoVersion && config.Gateway.Mode != config.GatewayModeDisabled) {
 			// Configure route for svc towards shared gw bridge
 			// Have to have the route to bridge for multi-NIC mode, where the default gateway may go to a non-OVS interface
 			if err := configureSvcRouteViaBridge(bridgeName); err != nil {
 				return err
+			}
+			needLegacySvcRoute = false
+		} else if config.Gateway.Mode == config.GatewayModeDisabled {
+			klog.Info("Gateway mode is disabled, route K8S Service via mp0")
+			// add route for service via mp0
+			link, err := util.LinkSetUp(types.K8sMgmtIntfName)
+			if err != nil {
+				return fmt.Errorf("unable to get link for %s, error: %v", types.K8sMgmtIntfName, err)
+			}
+			var gwIP net.IP
+			for _, subnet := range config.Kubernetes.ServiceCIDRs {
+				if utilnet.IsIPv4CIDR(subnet) {
+					gwIP = mgmtPortConfig.ipv4.gwIP
+				} else {
+					gwIP = mgmtPortConfig.ipv6.gwIP
+				}
+				err := util.LinkRoutesAddOrUpdateSourceOrMTU(link, gwIP, []*net.IPNet{subnet}, config.Default.MTU, nil)
+				if err != nil {
+					return fmt.Errorf("unable to add legacy route for services via mp0, error: %v", err)
+				}
 			}
 			needLegacySvcRoute = false
 		}
@@ -491,7 +513,7 @@ func (n *OvnNode) Start(ctx context.Context, wg *sync.WaitGroup) error {
 				// upgrade complete now see what needs upgrading
 				// migrate service route from ovn-k8s-mp0 to shared gw bridge
 				if (initialTopoVersion < types.OvnHostToSvcOFTopoVersion && config.GatewayModeShared == config.Gateway.Mode) ||
-					(initialTopoVersion < types.OvnRoutingViaHostTopoVersion) {
+					(initialTopoVersion < types.OvnRoutingViaHostTopoVersion && config.Gateway.Mode != config.GatewayModeDisabled) {
 					if err := upgradeServiceRoute(bridgeName); err != nil {
 						klog.Fatalf("Failed to upgrade service route for node, error: %v", err)
 					}

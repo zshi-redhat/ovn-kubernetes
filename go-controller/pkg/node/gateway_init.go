@@ -255,7 +255,7 @@ func configureSvcRouteViaInterface(iface string, gwIPs []net.IP) error {
 }
 
 func (n *OvnNode) initGateway(subnets []*net.IPNet, nodeAnnotator kube.Annotator,
-	waiter *startupWaiter, managementPortConfig *managementPortConfig, kubeNodeIP net.IP) error {
+	waiter *startupWaiter, managementPortConfig *managementPortConfig, kubeNodeIP string) error {
 	klog.Info("Initializing Gateway Functionality")
 	var err error
 	var ifAddrs []*net.IPNet
@@ -289,7 +289,7 @@ func (n *OvnNode) initGateway(subnets []*net.IPNet, nodeAnnotator kube.Annotator
 	// For DPU need to use the host IP addr which currently is assumed to be K8s Node cluster
 	// internal IP address.
 	if config.OvnKubeNode.Mode == types.NodeModeDPU {
-		ifAddrs, err = getDPUHostPrimaryIPAddresses(kubeNodeIP, ifAddrs)
+		ifAddrs, err = getDPUHostPrimaryIPAddresses(net.ParseIP(kubeNodeIP), ifAddrs)
 		if err != nil {
 			return err
 		}
@@ -313,20 +313,9 @@ func (n *OvnNode) initGateway(subnets []*net.IPNet, nodeAnnotator kube.Annotator
 		gw, err = newSharedGateway(n.name, subnets, gatewayNextHops, gatewayIntf, egressGWInterface, ifAddrs, nodeAnnotator, n.Kube,
 			managementPortConfig, n.watchFactory)
 	case config.GatewayModeDisabled:
-		var chassisID string
 		klog.Info("Gateway Mode is disabled")
-		gw = &gateway{
-			initFunc:  func() error { return nil },
-			readyFunc: func() (bool, error) { return true, nil },
-		}
-		chassisID, err = util.GetNodeChassisID()
-		if err != nil {
-			return err
-		}
-		err = util.SetL3GatewayConfig(nodeAnnotator, &util.L3GatewayConfig{
-			Mode:      config.GatewayModeDisabled,
-			ChassisID: chassisID,
-		})
+		gw, err = newEmptyGateway(n.name, subnets, gatewayNextHops, gatewayIntf, egressGWInterface, ifAddrs, kubeNodeIP, nodeAnnotator, n.Kube,
+			managementPortConfig, n.watchFactory)
 	}
 	if err != nil {
 		return err
@@ -359,7 +348,12 @@ func (n *OvnNode) initGateway(subnets []*net.IPNet, nodeAnnotator kube.Annotator
 	waiter.AddWait(readyGwFunc, initGwFunc)
 	n.gateway = gw
 
-	return n.validateVTEPInterfaceMTU()
+	if config.Gateway.Mode != config.GatewayModeDisabled {
+		if err = n.validateVTEPInterfaceMTU(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // interfaceForEXGW takes the interface requested to act as exgw bridge
