@@ -245,7 +245,7 @@ func (oc *DefaultNetworkController) syncNodeManagementPort(node *kapi.Node, host
 		if !utilnet.IsIPv6CIDR(hostSubnet) {
 			v4Subnet = hostSubnet
 		}
-		if config.Gateway.Mode == config.GatewayModeLocal {
+		if config.Gateway.Mode == config.GatewayModeLocal || config.Gateway.Mode == config.GatewayModeDisabled {
 			lrsr := nbdb.LogicalRouterStaticRoute{
 				Policy:   &nbdb.LogicalRouterStaticRoutePolicySrcIP,
 				IPPrefix: hostSubnet.String(),

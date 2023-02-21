@@ -239,12 +239,7 @@ func (oc *DefaultNetworkController) syncNodeGateway(node *kapi.Node, hostSubnets
 	}
 
 	if l3GatewayConfig.Mode == config.GatewayModeDisabled {
-		if err := oc.gatewayCleanup(node.Name); err != nil {
-			return fmt.Errorf("error cleaning up gateway for node %s: %v", node.Name, err)
-		}
-		if err := oc.joinSwIPManager.ReleaseJoinLRPIPs(node.Name); err != nil {
-			return err
-		}
+		// TODO: cleanup gateway when migrating to GatewayModeDisabled
 	} else if hostSubnets != nil {
 		var hostAddrs sets.String
 		if config.Gateway.Mode == config.GatewayModeShared {

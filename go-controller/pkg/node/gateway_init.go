@@ -312,21 +312,9 @@ func (n *OvnNode) initGateway(subnets []*net.IPNet, nodeAnnotator kube.Annotator
 		gw, err = newSharedGateway(n.name, subnets, gatewayNextHops, gatewayIntf, egressGWInterface, ifAddrs, nodeAnnotator, n.Kube,
 			managementPortConfig, n.watchFactory)
 	case config.GatewayModeDisabled:
-		var chassisID string
 		klog.Info("Gateway Mode is disabled")
-		gw = &gateway{
-			initFunc:     func() error { return nil },
-			readyFunc:    func() (bool, error) { return true, nil },
-			watchFactory: n.watchFactory.(*factory.WatchFactory),
-		}
-		chassisID, err = util.GetNodeChassisID()
-		if err != nil {
-			return err
-		}
-		err = util.SetL3GatewayConfig(nodeAnnotator, &util.L3GatewayConfig{
-			Mode:      config.GatewayModeDisabled,
-			ChassisID: chassisID,
-		})
+		gw, err = newEmptyGateway(n.name, subnets, gatewayNextHops, gatewayIntf, egressGWInterface, ifAddrs, nodeAnnotator, n.Kube,
+			managementPortConfig, n.watchFactory)
 	}
 	if err != nil {
 		return err

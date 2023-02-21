@@ -91,6 +91,31 @@ func clearOVSFlowTargets() error {
 	return nil
 }
 
+func setDefaultEncapPort() error {
+	if config.Gateway.SingleNode == true {
+		return nil
+	}
+	systemID, err := util.GetNodeChassisID()
+	if err != nil {
+		return err
+	}
+	uuid, _, err := util.RunOVNSbctl("--data=bare", "--no-heading", "--columns=_uuid", "find", "Encap",
+		fmt.Sprintf("chassis_name=%s", systemID))
+	if err != nil {
+		return err
+	}
+	if len(uuid) == 0 {
+		return fmt.Errorf("unable to find encap uuid to set geneve port for chassis %s", systemID)
+	}
+	_, stderr, errSet := util.RunOVNSbctl("set", "encap", uuid,
+		fmt.Sprintf("options:dst_port=%d", config.Default.EncapPort),
+	)
+	if errSet != nil {
+		return fmt.Errorf("error setting OVS encap-port: %v\n  %q", errSet, stderr)
+	}
+	return nil
+}
+
 // collectorsString joins all HostPort entry into a string that is acceptable as
 // target by the ovs-vsctl command. If an entry has an empty host, it uses the Node IP
 func collectorsString(node *kapi.Node, targets []config.HostPort) (string, error) {
@@ -244,23 +269,9 @@ func setupOVNNode(node *kapi.Node) error {
 	}
 	// If EncapPort is not the default tell sbdb to use specified port.
 	if config.Default.EncapPort != config.DefaultEncapPort {
-		systemID, err := util.GetNodeChassisID()
+		err = setDefaultEncapPort()
 		if err != nil {
 			return err
-		}
-		uuid, _, err := util.RunOVNSbctl("--data=bare", "--no-heading", "--columns=_uuid", "find", "Encap",
-			fmt.Sprintf("chassis_name=%s", systemID))
-		if err != nil {
-			return err
-		}
-		if len(uuid) == 0 {
-			return fmt.Errorf("unable to find encap uuid to set geneve port for chassis %s", systemID)
-		}
-		_, stderr, errSet := util.RunOVNSbctl("set", "encap", uuid,
-			fmt.Sprintf("options:dst_port=%d", config.Default.EncapPort),
-		)
-		if errSet != nil {
-			return fmt.Errorf("error setting OVS encap-port: %v\n  %q", errSet, stderr)
 		}
 	}
 
@@ -523,16 +534,36 @@ func (n *OvnNode) Start(ctx context.Context) error {
 			return fmt.Errorf("failed to get initial topology version: %w", err)
 		}
 		klog.Infof("Current control-plane topology version is %d", initialTopoVersion)
-		bridgeName := n.gateway.GetGatewayBridgeIface()
+		var bridgeName string
+		if config.Gateway.Mode != config.GatewayModeDisabled {
+			bridgeName = n.gateway.GetGatewayBridgeIface()
+		}
 
 		needLegacySvcRoute := true
 		if (initialTopoVersion >= types.OvnHostToSvcOFTopoVersion && config.GatewayModeShared == config.Gateway.Mode) ||
-			(initialTopoVersion >= types.OvnRoutingViaHostTopoVersion) {
+			(initialTopoVersion >= types.OvnRoutingViaHostTopoVersion && config.Gateway.Mode != config.GatewayModeDisabled) {
 			// Configure route for svc towards shared gw bridge
 			// Have to have the route to bridge for multi-NIC mode, where the default gateway may go to a non-OVS interface
 			if err := configureSvcRouteViaBridge(bridgeName); err != nil {
 				return err
 			}
+			needLegacySvcRoute = false
+		} else if config.Gateway.Mode == config.GatewayModeDisabled {
+			klog.Info("Gateway mode is disabled, route K8S Service via mp0")
+			// add route for service via mp0
+			_, err := util.LinkSetUp(types.K8sMgmtIntfName)
+			if err != nil {
+				return fmt.Errorf("unable to get link for %s, error: %v", types.K8sMgmtIntfName, err)
+			}
+			var gwIP net.IP
+			for _, subnet := range config.Kubernetes.ServiceCIDRs {
+				if utilnet.IsIPv4CIDR(subnet) {
+					gwIP = mgmtPortConfig.ipv4.gwIP
+				} else {
+					gwIP = mgmtPortConfig.ipv6.gwIP
+				}
+			}
+			klog.Info("Gateway mode is disabled, route K8S Service via mp0 %s", gwIP)
 			needLegacySvcRoute = false
 		}
 
@@ -566,7 +597,7 @@ func (n *OvnNode) Start(ctx context.Context) error {
 				// upgrade complete now see what needs upgrading
 				// migrate service route from ovn-k8s-mp0 to shared gw bridge
 				if (initialTopoVersion < types.OvnHostToSvcOFTopoVersion && config.GatewayModeShared == config.Gateway.Mode) ||
-					(initialTopoVersion < types.OvnRoutingViaHostTopoVersion) {
+					(initialTopoVersion < types.OvnRoutingViaHostTopoVersion && config.Gateway.Mode != config.GatewayModeDisabled) {
 					if err := upgradeServiceRoute(bridgeName); err != nil {
 						klog.Fatalf("Failed to upgrade service route for node, error: %v", err)
 					}

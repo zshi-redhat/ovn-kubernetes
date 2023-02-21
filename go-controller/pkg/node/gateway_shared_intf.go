@@ -452,10 +452,12 @@ func addServiceRules(service *kapi.Service, localEndpoints []string, svcHasLocal
 	var err error
 	var errors []error
 	if npw != nil {
-		if err = npw.updateServiceFlowCache(service, true, svcHasLocalHostNetEndPnt); err != nil {
-			errors = append(errors, err)
+		if config.Gateway.Mode != config.GatewayModeDisabled {
+			if err = npw.updateServiceFlowCache(service, true, svcHasLocalHostNetEndPnt); err != nil {
+				errors = append(errors, err)
+			}
+			npw.ofm.requestFlowSync()
 		}
-		npw.ofm.requestFlowSync()
 		if !npw.dpuMode {
 			// add iptable rules only in full mode
 			if err = addGatewayIptRules(service, localEndpoints, svcHasLocalHostNetEndPnt); err != nil {
@@ -765,8 +767,12 @@ func (npw *nodePortWatcher) SyncServices(services []interface{}) error {
 	if !npw.dpuMode {
 		keepIPTRules = append(keepIPTRules, egressSVCIPTDefaultReturnRule())
 	}
-	// sync OF rules once
-	npw.ofm.requestFlowSync()
+
+	if config.Gateway.Mode != config.GatewayModeDisabled {
+		// sync OF rules once
+		npw.ofm.requestFlowSync()
+	}
+
 	// sync IPtables rules once only for Full mode
 	if !npw.dpuMode {
 		// (NOTE: Order is important, add jump to iptableETPChain before jump to NP/EIP chains)
@@ -1740,20 +1746,28 @@ func newSharedGateway(nodeName string, subnets []*net.IPNet, gwNextHops []net.IP
 
 func newNodePortWatcher(gwBridge *bridgeConfiguration, nodeName string, ofm *openflowManager,
 	nodeIPManager *addressManager, watchFactory factory.NodeWatchFactory) (*nodePortWatcher, error) {
-	// Get ofport of patchPort
-	ofportPatch, stderr, err := util.GetOVSOfPort("--if-exists", "get",
-		"interface", gwBridge.patchPort, "ofport")
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
-			gwBridge.patchPort, stderr, err)
-	}
 
-	// Get ofport of physical interface
-	ofportPhys, stderr, err := util.GetOVSOfPort("--if-exists", "get",
-		"interface", gwBridge.uplinkName, "ofport")
-	if err != nil {
-		return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
-			gwBridge.uplinkName, stderr, err)
+	var ofportPatch string
+	var ofportPhys string
+	var stderr string
+	var err error
+
+	if config.Gateway.Mode != config.GatewayModeDisabled {
+		// Get ofport of patchPort
+		ofportPatch, stderr, err = util.GetOVSOfPort("--if-exists", "get",
+			"interface", gwBridge.patchPort, "ofport")
+		if err != nil {
+			return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
+				gwBridge.patchPort, stderr, err)
+		}
+
+		// Get ofport of physical interface
+		ofportPhys, stderr, err = util.GetOVSOfPort("--if-exists", "get",
+			"interface", gwBridge.uplinkName, "ofport")
+		if err != nil {
+			return nil, fmt.Errorf("failed to get ofport of %s, stderr: %q, error: %v",
+				gwBridge.uplinkName, stderr, err)
+		}
 	}
 
 	// In the shared gateway mode, the NodePort service is handled by the OpenFlow flows configured
@@ -1764,11 +1778,15 @@ func newNodePortWatcher(gwBridge *bridgeConfiguration, nodeName string, ofm *ope
 	// running on DPU or on DPU-Host.
 	if config.OvnKubeNode.Mode == types.NodeModeFull {
 		if config.Gateway.Mode == config.GatewayModeLocal {
-			if err := initLocalGatewayIPTables(); err != nil {
+			if err = initLocalGatewayIPTables(); err != nil {
 				return nil, err
 			}
 		} else if config.Gateway.Mode == config.GatewayModeShared {
-			if err := initSharedGatewayIPTables(); err != nil {
+			if err = initSharedGatewayIPTables(); err != nil {
+				return nil, err
+			}
+		} else if config.Gateway.Mode == config.GatewayModeDisabled {
+			if err = initEmptyGatewayIPTables(); err != nil {
 				return nil, err
 			}
 		}

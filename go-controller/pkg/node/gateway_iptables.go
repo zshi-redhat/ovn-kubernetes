@@ -26,6 +26,7 @@ const (
 	iptableETPChain        = "OVN-KUBE-ETP"        // called from nat-PREROUTING only
 	iptableITPChain        = "OVN-KUBE-ITP"        // called from mangle-OUTPUT and nat-OUTPUT
 	iptableESVCChain       = "OVN-KUBE-EGRESS-SVC" // called from nat-POSTROUTING
+	iptableMgmtPortChain   = "OVN-KUBE-MGMTPORT"   // called from nat-PREROUTING and nat-OUTPUT
 )
 
 func clusterIPTablesProtocols() []iptables.Protocol {
@@ -179,6 +180,52 @@ func getGatewayInitRules(chain string, proto iptables.Protocol) []iptRule {
 		)
 	}
 	return iptRules
+}
+
+func getLegacyEmptyGatewayInitRules(chain string, proto iptables.Protocol) []iptRule {
+	return []iptRule{}
+}
+
+func getEmptyGatewayNodePortIPTRules(svcPort kapi.ServicePort, targetIP string, targetPort int32, svcHasLocalHostNetEndPnt bool, nodeIP string) []iptRule {
+	chainName := iptableNodePortChain
+	if svcHasLocalHostNetEndPnt {
+		// DNAT it to the nodeIP:nodePort instead of clusterIP:targetPort
+		targetIP = nodeIP
+		targetPort = int32(svcPort.TargetPort.IntValue())
+	}
+	return []iptRule{
+		{
+			table: "nat",
+			chain: chainName,
+			args: []string{
+				"-p", string(svcPort.Protocol),
+				"-m", "addrtype",
+				"--dst-type", "LOCAL",
+				"--dport", fmt.Sprintf("%d", svcPort.NodePort),
+				"-j", "DNAT",
+				"--to-destination", util.JoinHostPortInt32(targetIP, targetPort),
+			},
+			protocol: getIPTablesProtocol(targetIP),
+		},
+	}
+}
+
+func getEmptyGatewayMgmtPortIPTRules(svcPort kapi.ServicePort, targetIP string, targetPort int32, nodeIP string) []iptRule {
+	chainName := iptableMgmtPortChain
+	return []iptRule{
+		{
+			table: "nat",
+			chain: chainName,
+			args: []string{
+				"-p", string(svcPort.Protocol),
+				"--dst", fmt.Sprintf("%s", targetIP),
+				"--dport", fmt.Sprintf("%d", svcPort.Port),
+				"-j", "DNAT",
+				"--to-destination", util.JoinHostPortInt32(nodeIP, targetPort),
+			},
+			protocol: getIPTablesProtocol(targetIP),
+		},
+	}
 }
 
 // getNodePortIPTRules returns the IPTable DNAT rules for a service of type nodePort
@@ -410,9 +457,30 @@ func getLocalGatewayNATRules(ifname string, cidr *net.IPNet) []iptRule {
 	}
 }
 
+func getEmptyGatewayNATRules(ifname string, cidr *net.IPNet) []iptRule {
+	// Allow packets to/from the gateway interface in case defaults deny
+	protocol := getIPTablesProtocol(cidr.IP.String())
+	return []iptRule{
+		{
+			table: "nat",
+			chain: "POSTROUTING",
+			args: []string{
+				"-s", cidr.String(),
+				"-j", "MASQUERADE",
+			},
+			protocol: protocol,
+		},
+	}
+}
+
 // initLocalGatewayNATRules sets up iptables rules for interfaces
 func initLocalGatewayNATRules(ifname string, cidr *net.IPNet) error {
 	return insertIptRules(getLocalGatewayNATRules(ifname, cidr))
+}
+
+// initEmptyGatewayNATRules sets up iptables rules for interfaces
+func initEmptyGatewayNATRules(ifname string, cidr *net.IPNet) error {
+	return insertIptRules(getEmptyGatewayNATRules(ifname, cidr))
 }
 
 func addChaintoTable(ipt util.IPTablesHelper, tableName, chain string) {
@@ -439,6 +507,13 @@ func handleGatewayIPTables(iptCallback func(rules []iptRule) error, genGatewayCh
 	}
 	if err := iptCallback(rules); err != nil {
 		return fmt.Errorf("failed to handle iptables rules %v: %v", rules, err)
+	}
+	return nil
+}
+
+func initEmptyGatewayIPTables() error {
+	if err := handleGatewayIPTables(insertIptRules, getGatewayInitRules); err != nil {
+		return err
 	}
 	return nil
 }
