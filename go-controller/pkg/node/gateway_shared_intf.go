@@ -485,10 +485,12 @@ func delServiceRules(service *kapi.Service, localEndpoints []string, npw *nodePo
 	var errors []error
 	// full mode || dpu mode
 	if npw != nil {
-		if err = npw.updateServiceFlowCache(service, false, false); err != nil {
-			errors = append(errors, fmt.Errorf("error updating service flow cache: %v", err))
+		if config.Gateway.Mode != config.GatewayModeDisabled {
+			if err = npw.updateServiceFlowCache(service, false, false); err != nil {
+				errors = append(errors, fmt.Errorf("error updating service flow cache: %v", err))
+			}
+			npw.ofm.requestFlowSync()
 		}
-		npw.ofm.requestFlowSync()
 		if !npw.dpuMode {
 			// Always try and delete all rules here in full mode & in host only mode. We don't touch iptables in dpu mode.
 			// +--------------------------+-----------------------+-----------------------+--------------------------------+

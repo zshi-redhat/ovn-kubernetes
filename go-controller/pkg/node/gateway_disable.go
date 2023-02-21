@@ -51,16 +51,17 @@ func newEmptyGateway(nodeName string, hostSubnets []*net.IPNet, gwNextHops []net
 
 	gw.readyFunc = func() (bool, error) { return true, nil }
 	gw.initFunc = func() error {
-		gw.nodeIPManager = newAddressManager(nodeName, kube, cfg, watchFactory, nil)
+		gwBridge := &bridgeConfiguration{}
+		gw.nodeIPManager = newAddressManager(nodeName, kube, cfg, watchFactory, gwBridge)
 		if config.Gateway.NodeportEnable {
-			gw.nodePortWatcher, err = newNodePortWatcher(nil, nodeName, nil, gw.nodeIPManager, watchFactory)
+			gw.nodePortWatcher, err = newNodePortWatcher(gwBridge, nodeName, nil, gw.nodeIPManager, watchFactory)
 			if err != nil {
 				return err
 			}
 		}
 		return nil
 	}
-
+	gw.watchFactory = watchFactory.(*factory.WatchFactory)
 	klog.Info("Empty Gateway Creation Complete")
 	return gw, nil
 }

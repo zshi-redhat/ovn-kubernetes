@@ -295,7 +295,9 @@ func NewNetworkControllerManager(ovnClient *util.OVNClientset, identity string, 
 
 // Init initializes the controller manager and create/start default controller
 func (cm *networkControllerManager) Init() error {
-	cm.configureMetrics(cm.stopChan)
+	if config.Gateway.Mode != config.GatewayModeDisabled {
+		cm.configureMetrics(cm.stopChan)
+	}
 
 	err := cm.configureSCTPSupport()
 	if err != nil {
